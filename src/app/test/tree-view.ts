@@ -33,8 +33,10 @@ export class TreeView implements OnInit {
 	// drag and drop
 	test: boolean = false;
     transferData: Object = {id: 1, msg: 'Hello', draw: true};
-    receivedData: Array<any> = [];
-
+    receivedData: Array<any> = [];	
+    selected : any;
+	selectedId : any;
+	selectedName : any;
     constructor(private componentResolver: ComponentFactoryResolver,
                 private router: Router, private _http: Http){
 	this.currentUser = JSON.parse(localStorage.getItem("currentUser"));    
@@ -330,11 +332,22 @@ setTimeout(()=>{ cl3.product = this._http.get("/api/sfa/"+cl3.attribut.ID)
         
 		
      }
-transferDataSuccess($event: any) {
+transferDataSuccess($event: any , att: any) {
         alert("GOOOOOOOOOOOOOD");
         this.test = true;
-        this.receivedData.push($event);
-        console.log("cc",this.receivedData);
+	 let mapp = {classification_id : this.selectedId , sfa : null , status : "en cours"};
+	mapp.classification_id = this.selectedId;
+	mapp.sfa = att;
+	mapp.status = 'en cours';
+        this.receivedData.push(mapp);
+
+	this.selected = "Mapping success : classification : "+ mapp.classification_id +" attribut: "+ mapp.sfa+" status : "+mapp.status; 
+        console.log("cc",mapp);
     }	
-    
+getSelectedNode(id:any, name: any){
+	this.selected = null;
+	this.selectedId = id;
+	this.selectedName = name;
+	console.log("cc",id,"  ==> ", name);
+}    
 }

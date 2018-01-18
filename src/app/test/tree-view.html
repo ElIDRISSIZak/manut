@@ -19,14 +19,37 @@
 
 <div class="row">
 	        
-	<!--<div class="col-md-2">
-                 <button type="button" class="btn btn-success" (click) = "getAttribut()">get Attribut</button>             
-        </div>--> 
+<nav class="navbar navbar-default" *ngIf="selected != null;else other_nav" style="background:#36c615; color:white;">
+                    <div class="container-fluid">
+                        <div class="navbar-header">
+                        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                            <ul class="nav navbar-nav" >
+                            <li><a>Selected : {{selected}} </a></li>
+                            </ul>
+                        </div>
+                        </div>
+                    </div>
+                </nav>	
+<ng-template #other_nav >
+                                        
+<nav class="navbar navbar-default" >
+                    <div class="container-fluid">
+                        <div class="navbar-header">
+                        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                            <ul class="nav navbar-nav" *ngIf="selectedId && selectedName">
+                            <li><a>Selected : {{selectedId}} <br>name: {{selectedName}} </a></li>
+                            </ul>
+                        </div>
+                        </div>
+                    </div>
+                </nav>
+  
+</ng-template>	
         <br>
 	<div  class="col-md-6" *ngIf="ClassificationFi == null" >
 		Données Filiale pas encore disponible
 	</div>
-	<div  class="col-md-6" *ngIf="ClassificationFi?.length > 0" >
+	<div  class="col-md-6" *ngIf="ClassificationFi?.length > 0" style=" padding-left: 40px;">
             <h3 class="card-header text-left">Données Filiale</h3>
 	    	
 	    <div class="z" style="overflow: auto; max-height:410px; float: left; clear: left;white-space: nowrap;">			
@@ -40,8 +63,8 @@
                            <span (click)="toggle(cl)" class="iconButton" [ngClass]='{"tree-node-no-children": !cl.showIcon}' >
                                 {{cl.icon}}
                             </span>
-                            <span dnd-draggable [dragEnabled]="true" [dragData]="cl.id">
-                                <strong>drg=>{{cl.name }}</strong>
+                            <span dnd-draggable [dragEnabled]="true" [dragData]="cl.id" (click)="getSelectedNode(cl.id, cl.name)">
+                                <strong class="focus">=>{{cl.name }}</strong>
 
                             </span>
                         
@@ -57,7 +80,7 @@
 					<ng-template #other_cl2 >
                                                  <span (click)="toggle(cl2)"><img src="/assets/icons/icon-done.png" style=" width:14px; height:14px;"/></span>
                                         </ng-template>	
-                                               <span >
+                                               <span dnd-draggable [dragEnabled]="true" [dragData]="cl2.id" (click)="getSelectedNode(cl2.id, cl2.name)">
                                 		<strong>{{cl2.name }}</strong>
 
                             			</span>
@@ -152,7 +175,7 @@
                                                     
                                                     
                                                     
-                                                        <span>
+                                                        <span dnd-draggable [dragEnabled]="true" [dragData]="cl3.id" (click)="getSelectedNode(cl3.id, cl3.name)"> 
                                                                 <strong>{{cl3.name }}</strong>
                                                         </span> 
                                                         <div *ngIf="cl3.expanded">
@@ -253,7 +276,7 @@
 										<img src="/assets/icons/icon-done.png" style=" width:14px; height:14px;"/>
 									</span>
                                                     		    </ng-template>
-                                                                    <span >
+                                                                    <span dnd-draggable [dragEnabled]="true" [dragData]="cl4.id" (click)="getSelectedNode(cl4.id, cl4.name)">
                                                                             <strong>{{cl4.name }}</strong>
                                                                     </span> 
 								<!-- PRODUCTS -->
@@ -417,7 +440,7 @@
 						<span *ngIf="cl2.product">
 									</span>
 				<div *ngIf="cl2.product">
-					<span [matTooltip]="cl2.product.attribut.ID" [matTooltipPosition]="position">{{cl2.product.Name["0"]}}</span>
+					<span dnd-droppable (onDropSuccess)="transferDataSuccess($event , cl2.product.attribut.ID)" [matTooltip]="cl2.product.attribut.ID" [matTooltipPosition]="position">tstDRP: {{cl2.product.Name["0"]}}</span>
 					
 
 
@@ -434,7 +457,7 @@
                                                  			<img  src="/assets/icons/notImportant.png" style=" width:14px; height:14px;"/>
                                         				</ng-template>	
 								<span *ngIf = "att.MetaData;else other_meta">
-                     		<span dnd-droppable (onDropSuccess)="transferDataSuccess($event)" (click)="toggle(att)" [matTooltip]="att.MetaData['0'].Value['0']._" [matTooltipPosition]="position">
+                     		<span  (click)="toggle(att)" [matTooltip]="att.MetaData['0'].Value['0']._" [matTooltipPosition]="position">
                                                                             <strong>drp=> {{att.attribut.AttributeID }}</strong>
                                                                         </span> 
 								</span>	
@@ -510,7 +533,7 @@
                                                         </span> 
                                                         <div *ngIf="cl3.expanded">
 								
-				<span *ngIf="cl3.product" [matTooltip]="cl3.product.attribut.ID" [matTooltipPosition]="position" >
+				<span *ngIf="cl3.product" dnd-droppable (onDropSuccess)="transferDataSuccess($event , cl3.product.attribut.ID)" [matTooltip]="cl3.product.attribut.ID" [matTooltipPosition]="position" >
 								{{cl3.product.Name["0"]}}
 							</span>
 								
@@ -588,7 +611,7 @@
 									
 						<div *ngIf="cl4.expanded">
 					
-						<span *ngIf="cl4.product" [matTooltip]="cl4.product.attribut.ID" [matTooltipPosition]="position" >
+			<span *ngIf="cl4.product" dnd-droppable (onDropSuccess)="transferDataSuccess($event , cl4.product.attribut.ID)" [matTooltip]="cl4.product.attribut.ID" [matTooltipPosition]="position" >
 										{{cl4.product.Name["0"]}}
 										</span>
 
@@ -678,7 +701,7 @@
     </div>
 
 
-<div>{{transferData | json}}</div>
+<!--<div>{{transferData | json}}</div>-->
 
 <!-- <div class="row">
     <div class="col-md-6" *ngIf="result">

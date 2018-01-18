@@ -10,3 +10,9 @@
 .sortable  {
     cursor: pointer;
 }
+.focus:focus{
+background-color : green;
+}
+
+
+
