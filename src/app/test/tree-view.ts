@@ -40,6 +40,10 @@ export class TreeView implements OnInit {
 	color : any;
 	idDropped:any;
 	idDragged:any;
+	restrictedDrop1: any = null;
+	idDropped2 : any;
+	idDragged2:any;
+	color2 : any;
     constructor(private componentResolver: ComponentFactoryResolver,
                 private router: Router, private _http: Http){
 	this.currentUser = JSON.parse(localStorage.getItem("currentUser"));    
@@ -335,6 +339,7 @@ setTimeout(()=>{ cl3.product = this._http.get("/api/sfa/"+cl3.attribut.ID)
         
 		
      }
+// Mapping Produit TO SFA
 transferDataSuccess($event: any , att: any) {
         alert("GOOOOOOOOOOOOOD");
         this.test = true;
@@ -354,5 +359,23 @@ getSelectedNode(id:any, name: any){
 	this.selectedId = id;
 	this.selectedName = name;
 	console.log("cc",id,"  ==> ", name);
-}    
+} 
+// Mapping Produit TO SFA
+transferDataSuccess2($event: any , att: any) {
+        alert("Mapping Type 2: Success");
+        this.test = true;
+	 let mapp2 = {attribut : null , attributsfa : null , status : "en cours"};
+	mapp2.attribut = $event.dragData;
+	mapp2.attributsfa = att;
+	mapp2.status = 'en cours';
+        //this.receivedData.push(mapp);
+	this.color2 = 'orange';
+	//this.idDragged = $event.dragData;
+	this.idDropped2 = att;
+	this.idDragged2 = $event.dragData;
+	//this.selected = "Mapping success : classification : "+ mapp.classification_id +" attribut: "+ mapp.sfa+" status : "+mapp.status; 
+        console.log("EVENT => ",this.idDragged2);
+    } 
+
+  
 }
