@@ -866,6 +866,47 @@ router.get('/sfa/:idclassif', (req, res) => {
    
 });
 
+//18/01
+
+// Insert JSON format is database from SFA Attribute
+    router.get('/insertion4', (req, res) => {
+        var collection;
+    connection((db) => {
+        collection = db.collection('attribute');
+         //console.log(collection);
+    });
+    //console.log(collection);
+   
+    var fs = require('fs');
+    fs.readFile('uploads/manutanSFA.xml', (err, data) => {
+        if (err) throw err;
+        // var json = JSON.parse(data);
+        var parser = new xml2js.Parser({ attrkey: 'attribut' });
+        parser.parseString(data, function (err, result) {
+            // res.json(result);
+            console.log("=>",result, "<="); 
+            var last1 = 0;
+            var attribute = result['STEP-ProductInformation']['AttributeList'];
+            console.log(result);
+            // suppression des données dans la collection productsmanutan
+            connection((db) => {
+               db.collection('attribute').deleteMany({}); 
+            });
+            //insertion des product avec item product par product
+            attribute.forEach((obj) => {
+                
+                connection((db) => {
+                    db.collection('attribute').insert(obj['Attribute'], {safe: true});
+                });
+            });                    
+        if(err) throw err;           
+        });
+            res.json("file inserted ");
+      });
+    });
+
+
+
 //Login
 router.post('/testing', (req, res, next) => {
     var user = req.body;
@@ -890,6 +931,214 @@ router.post('/testing', (req, res, next) => {
     }
         
 });
+/* Johnny
+ request sfa id + Tag name + name unit */
+router.get('/sfa2/:gmc', (req, res) => {
+            
+    db.collection("productsmanutan").find({"ClassificationReference.attribut.ClassificationID" : req.params.gmc},function(err, result) {
+		 var name = 'X';
+          result.forEach((sfa) => {
+		sfa.testzak = "testzak";
+            if (sfa.AttributeLink != null && typeof(sfa.AttributeLink) != "undefined") {
+		var attrs = sfa.AttributeLink;
+                attrs.forEach((attributLink) => {
+                attributLink.testzak = "testzak";
+		attributLink.units= [];
+		var units = [];
+                // request ID + url attribute
+                /*db.collection("attribute").findOne({"attribut.ID" : attributLink.attribut.AttributeID}, function(err, attributes) {
+                //attributLink.name = attributes.Name;
+                name = attributes.Name;
+                console.log("=====",name);                         
+                        
+                        if (attributes.Validation != null && typeof(attributes.Validation) != "undefined") {   
+                            var validations = attributes.Validation;                             
+                            var unitLinks = validations[0].UnitLink;
+ 
+                                if (unitLinks != null && typeof(unitLinks) != "undefined") {
+                                    
+                                      var cpt = 0;
+                                      unitLinks.forEach((unitLink) => {          
+                                                       
+                                        db.collection("unit").findOne({"attribut.ID":unitLink.attribut.UnitID }, function(err, unit) {
+                                          if (err) throw err;
+                                           console.log(unitLink.attribut.UnitID);
+                                           console.log(unit);                                     
+                                           attributLink.units.push(unit);
+						units.push(unit);
+                                           //console.log(attributLink.units); 
+                                          cpt++;
+                                        }); 
+                                      });
+                                }
+                        };
+                    });*/
+                   //attributLink.units.push("zakaria"); 
+			console.log("==>",name);	
+               
+				db.collection("attribute").findOne({"attribut.ID" : attributLink.attribut.AttributeID}, function(err, attributes) {
+					console.log("==>test first",attributes.Name);
+					attributLink.name = "testzak2";
+				});
+		});
+            }                         
+        }); 
+	console.log(result);
+	res.json(result);
+   });
+	
+});
+
+// Insert JSON format is database from SFA
+    router.get('/insertion3', (req, res) => {
+        var collection;
+    connection((db) => {
+        collection = db.collection('productsmanutan');
+         //console.log(collection);
+    });
+    //console.log(collection);
+   
+    var fs = require('fs');
+    fs.readFile('uploads/manutanSFA.xml', (err, data) => {
+        if (err) throw err;
+        // var json = JSON.parse(data);
+        var parser = new xml2js.Parser({ attrkey: 'attribut' });
+        parser.parseString(data, function (err, result) {
+            // res.json(result);
+            console.log("=>",result, "<="); 
+            var last = 0;
+            var products = result['STEP-ProductInformation']['Products'];
+            // suppression des données dans la collection productsmanutan
+            connection((db) => {
+               db.collection('productsmanutan').deleteMany({}); 
+            });
+            //insertion des product avec item product par product
+            products.forEach((item) => {
+                
+                connection((db) => {
+                    db.collection('productsmanutan').insert(item['Product'], {safe: true});
+                });
+            });                    
+        if(err) throw err;           
+        });
+            res.json("file inserted ");
+      });
+    });
+    
+    // Insert JSON format is database from SFA Attribute
+    router.get('/insertion4', (req, res) => {
+        var collection;
+    connection((db) => {
+        collection = db.collection('attribute');
+         //console.log(collection);
+    });
+    //console.log(collection);
+   
+    var fs = require('fs');
+    fs.readFile('uploads/manutanSFA.xml', (err, data) => {
+        if (err) throw err;
+        // var json = JSON.parse(data);
+        var parser = new xml2js.Parser({ attrkey: 'attribut' });
+        parser.parseString(data, function (err, result) {
+            // res.json(result);
+            console.log("=>",result, "<="); 
+            var last1 = 0;
+            var attribute = result['STEP-ProductInformation']['AttributeList'];
+            console.log(result);
+            // suppression des données dans la collection productsmanutan
+            connection((db) => {
+               db.collection('attribute').deleteMany({}); 
+            });
+            //insertion des product avec item product par product
+            attribute.forEach((obj) => {
+                
+                connection((db) => {
+                    db.collection('attribute').insert(obj['Attribute'], {safe: true});
+                });
+            });                    
+        if(err) throw err;           
+        });
+            res.json("file inserted ");
+      });
+    });
+    
+   // csv to json 
+    router.get('/csv', (req, res) => {
+    
+    var collection;
+    connection((db) => {
+        collection = db.collection('filiale1');
+         //console.log(collection);
+    });
+ 
+    var json = csvToJson.getJsonFromCsv("uploads/filiale1.csv");
+    for(var i=0; i<json.length;i++){
+        console.log(json[i]);
+    }
+
+   //console.log(json);
+   var fs = require('fs');
+        var fileInputName = 'uploads/filiale1.csv'; 
+        var fileOutputName = 'uploads/fil.json';
+         
+        csvToJson.generateJsonFileFromCsv(fileInputName,fileOutputName);
+      fs.readFile(fileOutputName, 'utf8', function (erreur, donnees) {
+         if (erreur)
+            throw erreur; // Vous pouvez gérer les erreurs avant de parser le JSON
+         var filiales1 = JSON.parse(donnees);
+         
+            connection((db) => {
+               db.collection('filiale1').deleteMany({}); 
+            });
+         
+         filiales1.forEach((objf1) => {
+            
+                connection((db) => {
+                    db.collection('filiale1').insert(objf1, {safe: true});
+                });
+         });    
+      }); 
+  });
+    
+        // Insert JSON format is database from SFA Unit
+    router.get('/insertion5', (req, res) => {
+        var collection;
+    connection((db) => {
+        collection = db.collection('unit');
+         //console.log(collection);
+    });
+    //console.log(collection);
+   
+    var fs = require('fs');
+    fs.readFile('uploads/manutanSFA.xml', (err, data) => {
+        if (err) throw err;
+        // var json = JSON.parse(data);
+        var parser = new xml2js.Parser({ attrkey: 'attribut' });
+        parser.parseString(data, function (err, result) {
+            // res.json(result);
+            console.log("=>",result, "<="); 
+            var last1 = 0;
+            var unit = result['STEP-ProductInformation']['UnitList'];
+            console.log(result);
+            // suppression des données dans la collection productsmanutan
+            connection((db) => {
+               db.collection('unit').deleteMany({}); 
+            });
+            //insertion des product avec item product par product
+            unit.forEach((obj1) => {
+                
+                connection((db) => {
+                    db.collection('unit').insert(obj1['Unit'], {safe: true});
+                });
+            });                    
+        if(err) throw err;           
+        });
+            res.json("file inserted ");
+      });
+    });
+
+/*  FIIIIIIIIN */
+
 // Uploading File
 var storage = multer.diskStorage({ //multers disk storage settings
 

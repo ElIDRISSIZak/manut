@@ -37,6 +37,9 @@ export class TreeView implements OnInit {
     selected : any;
 	selectedId : any;
 	selectedName : any;
+	color : any;
+	idDropped:any;
+	idDragged:any;
     constructor(private componentResolver: ComponentFactoryResolver,
                 private router: Router, private _http: Http){
 	this.currentUser = JSON.parse(localStorage.getItem("currentUser"));    
@@ -335,14 +338,16 @@ setTimeout(()=>{ cl3.product = this._http.get("/api/sfa/"+cl3.attribut.ID)
 transferDataSuccess($event: any , att: any) {
         alert("GOOOOOOOOOOOOOD");
         this.test = true;
-	 let mapp = {classification_id : this.selectedId , sfa : null , status : "en cours"};
-	mapp.classification_id = this.selectedId;
+	 let mapp = {classification_id : null , sfa : null , status : "en cours"};
+	mapp.classification_id = $event.dragData;
 	mapp.sfa = att;
 	mapp.status = 'en cours';
         this.receivedData.push(mapp);
-
+	this.color = 'cyan';
+	this.idDragged = $event.dragData;
+	this.idDropped = att;
 	this.selected = "Mapping success : classification : "+ mapp.classification_id +" attribut: "+ mapp.sfa+" status : "+mapp.status; 
-        console.log("cc",mapp);
+        console.log("cc",this.receivedData);
     }	
 getSelectedNode(id:any, name: any){
 	this.selected = null;

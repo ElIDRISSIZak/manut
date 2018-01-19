@@ -64,7 +64,16 @@
                                 {{cl.icon}}
                             </span>
                             <span dnd-draggable [dragEnabled]="true" [dragData]="cl.id" (click)="getSelectedNode(cl.id, cl.name)">
-                                <strong class="focus">=>{{cl.name }}</strong>
+				 
+							<span *ngIf="idDragged == cl.id;else other_span" [ngStyle]="{'background-color' : color}">
+										<strong >=>{{cl.name }}</strong>
+							</span>
+										<ng-template #other_span>
+                                                 					<strong >=>{{cl.name }}</strong>
+                                        					</ng-template>
+						
+                               
+				
 
                             </span>
                         
@@ -81,7 +90,14 @@
                                                  <span (click)="toggle(cl2)"><img src="/assets/icons/icon-done.png" style=" width:14px; height:14px;"/></span>
                                         </ng-template>	
                                                <span dnd-draggable [dragEnabled]="true" [dragData]="cl2.id" (click)="getSelectedNode(cl2.id, cl2.name)">
-                                		<strong>{{cl2.name }}</strong>
+							<span *ngIf="idDragged == cl2.id;else other_span" [ngStyle]="{'background-color' : color}">
+										<strong>{{cl2.name }}</strong>
+							</span>
+										<ng-template #other_span>
+                                                 					<strong>{{cl2.name }}</strong>
+                                        					</ng-template>
+
+                                		
 
                             			</span>
 			
@@ -114,9 +130,12 @@
                                                        		</span>
                                               		     </span>
 							    
-                                                             <span>
+                                                             <span *ngIf="idDragged == cl2.id || idDragged == cl.id;else other_span" [ngStyle]="{'background-color' : color}">
                                   <strong [matTooltip]="product.shortdesc" [matTooltipPosition]="positionprod">{{product.name }}</strong>
                                                              </span> 
+								<ng-template #other_span>
+                                                 			<strong [matTooltip]="product.shortdesc" [matTooltipPosition]="positionprod">{{product.name }}</strong>
+                                        			</ng-template>
 								
 								<!-- ADD Attribut last LEVEL -->
 								
@@ -176,8 +195,19 @@
                                                     
                                                     
                                                         <span dnd-draggable [dragEnabled]="true" [dragData]="cl3.id" (click)="getSelectedNode(cl3.id, cl3.name)"> 
-                                                                <strong>{{cl3.name }}</strong>
-                                                        </span> 
+									<span *ngIf="idDragged == cl3.id;else other_span" [ngStyle]="{'background-color' : color}">
+										<strong>{{cl3.name }}</strong>
+									</span>
+										<ng-template #other_span>
+                                                 					<strong>{{cl3.name }}</strong>
+                                        					</ng-template>
+
+                                		
+
+                            				</span>
+
+                                                                
+                                                        
                                                         <div *ngIf="cl3.expanded">
 								<span *ngIf="!cl3.classification?.length > 0">
                                                                 <ul *ngIf="cl3.models?.length > 0">
@@ -210,7 +240,17 @@
                                                         	<img src="/assets/icons/product-icon.png" style=" width:10px; height:10px;"/>
                                                              </ng-template>
                                                                     <span >
-                                                <strong [matTooltip]="cl44.shortdesc" [matTooltipPosition]="positionprod"> {{cl44.name }}</strong>
+
+
+									<span *ngIf="idDragged == cl3.id || idDragged == cl2.id || idDragged == cl.id;else other_span" [ngStyle]="{'background-color' : color}">
+										<strong [matTooltip]="cl44.shortdesc" [matTooltipPosition]="positionprod"> {{cl44.name }}</strong>
+									</span>
+										<ng-template #other_span>
+                                                 					<strong [matTooltip]="cl44.shortdesc" [matTooltipPosition]="positionprod"> {{cl44.name }}</strong>
+                                        					</ng-template>
+
+
+                                                
                                                                     </span> 
 								<!-- HEEEEEEEEEEEEEEEEEEEEEERE --> 
 								<!-- ADD Attribut last LEVEL -->
@@ -277,7 +317,13 @@
 									</span>
                                                     		    </ng-template>
                                                                     <span dnd-draggable [dragEnabled]="true" [dragData]="cl4.id" (click)="getSelectedNode(cl4.id, cl4.name)">
-                                                                            <strong>{{cl4.name }}</strong>
+									<span *ngIf="idDragged == cl4.id;else other_span" [ngStyle]="{'background-color' : color}">
+										<strong>{{cl4.name }}</strong>
+									</span>
+										<ng-template #other_span>
+                                                 					<strong>{{cl4.name }}</strong>
+                                        					</ng-template>
+                                                                            
                                                                     </span> 
 								<!-- PRODUCTS -->
 							<div *ngIf="cl4.expanded">
@@ -327,7 +373,13 @@
                                                         	<img src="/assets/icons/product-icon.png" style=" width:10px; height:10px;"/>
                                                              </ng-template>
                                                                     <span >
-                                               <strong [matTooltip]="cl6.shortdesc" [matTooltipPosition]="positionprod">{{cl6.name }}</strong>
+					<span *ngIf="idDragged == cl4.id || idDragged == cl3.id || idDragged == cl2.id || idDragged == cl.id;else other_span" [ngStyle]="{'background-color' : color}">
+										<strong [matTooltip]="cl6.shortdesc" [matTooltipPosition]="positionprod">{{cl6.name }}</strong>
+									</span>
+										<ng-template #other_span>
+                                                 					<strong [matTooltip]="cl6.shortdesc" [matTooltipPosition]="positionprod">{{cl6.name }}</strong>
+                                        					</ng-template>
+
                                                                     </span> 
 								<!-- ADD Attribut last LEVEL -->
 								
@@ -440,10 +492,15 @@
 						<span *ngIf="cl2.product">
 									</span>
 				<div *ngIf="cl2.product">
-					<span dnd-droppable (onDropSuccess)="transferDataSuccess($event , cl2.product.attribut.ID)" [matTooltip]="cl2.product.attribut.ID" [matTooltipPosition]="position">tstDRP: {{cl2.product.Name["0"]}}</span>
+<span dnd-droppable (onDropSuccess)="transferDataSuccess($event , cl2.product.attribut.ID)" [matTooltip]="cl2.product.attribut.ID" [matTooltipPosition]="position" >
 					
-
-
+						<span *ngIf="idDropped == cl2.product.attribut.ID;else other_span" [ngStyle]="{'background-color' : color}">
+										{{cl2.product.Name["0"]}}
+						</span>
+										<ng-template #other_span>
+                                                 					{{cl2.product.Name["0"]}}
+                                        					</ng-template>
+		</span>
 
 								<div *ngIf="cl2.product">
 									<span *ngIf="cl2.product.AttributeLink?.length > 0;else other_content" >
@@ -534,7 +591,12 @@
                                                         <div *ngIf="cl3.expanded">
 								
 				<span *ngIf="cl3.product" dnd-droppable (onDropSuccess)="transferDataSuccess($event , cl3.product.attribut.ID)" [matTooltip]="cl3.product.attribut.ID" [matTooltipPosition]="position" >
-								{{cl3.product.Name["0"]}}
+								<span *ngIf="idDropped == cl3.product.attribut.ID;else other_span" [ngStyle]="{'background-color' : color}">
+										{{cl3.product.Name["0"]}}
+										</span>
+										<ng-template #other_span>
+                                                 					{{cl3.product.Name["0"]}}
+                                        					</ng-template>
 							</span>
 								
 									<div *ngIf="cl3.product">
@@ -612,9 +674,13 @@
 						<div *ngIf="cl4.expanded">
 					
 			<span *ngIf="cl4.product" dnd-droppable (onDropSuccess)="transferDataSuccess($event , cl4.product.attribut.ID)" [matTooltip]="cl4.product.attribut.ID" [matTooltipPosition]="position" >
+										<span *ngIf="idDropped == cl4.product.attribut.ID;else other_span" [ngStyle]="{'background-color' : color}">
 										{{cl4.product.Name["0"]}}
 										</span>
-
+										<ng-template #other_span>
+                                                 					{{cl4.product.Name["0"]}}
+                                        					</ng-template>
+			</span>
 			<span *ngIf="cl4.product.AttributeLink?.length > 0;else other_content" >
 					<ul><li style=" list-style: none;" (click)="toggle(cl4.product.AttributeLink)"><strong>Attributs</strong></li></ul>
 								<div *ngIf="cl4.product.AttributeLink.expanded">
