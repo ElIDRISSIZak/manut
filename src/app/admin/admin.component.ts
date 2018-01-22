@@ -15,6 +15,7 @@ export class AdminComponent {
   sfa: any;
   public uploader:FileUploader = new FileUploader({url:'/api/upload'});
   currentUser:User;
+	arrayFiliale : string [] = [ 'filiale1' , 'Rapide Racking', 'Key' , 'Pichon' , 'Witre' , 'Casal Sport' , 'Ikaros'];
   constructor(private _http: Http ,private _adminService: AdminService , private router: Router , private _location: Location ) {
 	if (localStorage.getItem('ifAdmin') != "true") {
 
@@ -101,8 +102,10 @@ export class AdminComponent {
 		}
 	}}
 	else if (this.currentUser.structure == "filiale1"){
+		 
 		for( let item of this.uploader.queue ){
-		if(item.file.name.includes("filiale1")){
+		console.log("TEST ARRAY FILIALE  => ", this.arrayFiliale.includes(item.file.name)); 
+		if(item.file.name.includes(this.currentUser.structure)){
 			item.upload();
 		}
 		else{

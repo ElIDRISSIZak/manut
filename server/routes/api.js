@@ -13,7 +13,8 @@ var cors = require('cors');
 var multer = require('multer');
 // converting xsls file to Json
 const xlsxj = require("xlsx-to-json");
-
+// require csvtojson
+var csvToJson = require('convert-csv-to-json');
 
 // Connect
 const connection = (closure) => {
@@ -189,7 +190,7 @@ router.delete('/task/:id', (req, res, next) => {
 
 
 // Get classifications from Database and display JSON format
-router.get('/test2', (req, res) => {
+router.get('/classificationGMC', (req, res) => {
     /*var fs = require('fs');
     fs.readFile('step-xml.xml', (err, data) => {
         if (err) throw err;
@@ -1032,7 +1033,7 @@ router.get('/sfa2/:gmc', (req, res) => {
         collection = db.collection('attribute');
          //console.log(collection);
     });
-    //console.log(collection);
+
    
     var fs = require('fs');
     fs.readFile('uploads/manutanSFA.xml', (err, data) => {
@@ -1076,7 +1077,7 @@ router.get('/sfa2/:gmc', (req, res) => {
         console.log(json[i]);
     }
 
-   //console.log(json);
+
    var fs = require('fs');
         var fileInputName = 'uploads/filiale1.csv'; 
         var fileOutputName = 'uploads/fil.json';
@@ -1096,8 +1097,10 @@ router.get('/sfa2/:gmc', (req, res) => {
                 connection((db) => {
                     db.collection('filiale1').insert(objf1, {safe: true});
                 });
-         });    
+         });  
+	res.json(donnees);  
       }); 
+	
   });
     
         // Insert JSON format is database from SFA Unit
@@ -1136,6 +1139,55 @@ router.get('/sfa2/:gmc', (req, res) => {
             res.json("file inserted ");
       });
     });
+
+/*==========================================================================================*/
+/*===================================Mapping Filiale========================================*/
+/*==========================================================================================*/
+
+router.get('/mappingsfa/:idf/:idsfa/:user', (req, res) => {
+
+	
+	var idf = req.params.idf;
+	var idsfa = req.params.idsfa;
+	var userId = req.params.user;
+	var structure;
+	
+	
+	db.collection("users").findOne({"username": userId}, function(err, user) {
+		
+		structure = user.structure;
+		if(structure != "manutan"){
+			var product;
+			db.collection(structure).findOne({"ProductID" : idf}, function(err, product) {				
+				console.log(product);
+				if( product != null) {
+					console.log("product");
+					db.collection('mappingsfa').remove({"idf":idf});
+					db.collection('mappingsfa').insert({"idf":idf, "idsfa":idsfa, "user":userId, "date": Date.now(), "statut":"provisoire" });
+				} else {
+					db.collection(structure).distinct("ProductID", {$or : [{"Classificationlevel1ID" : idf}, {"Classificationlevel2ID" : idf}, {"Classificationlevel3ID" : idf}, {"Classificationlevel4ID" : idf}, {"ModelID" : idf}] }, function(err, idproduct) {
+						
+						 if(idproduct != null){
+							 idproduct.forEach((productline) => {
+							 	db.collection('mappingsfa').findOne({"idf" : productline}, function(err, mapping) {	
+									 console.log(productline);
+									 if (mapping == null){
+										 console.log("insert one");
+										 db.collection('mappingsfa').insert({"idf": productline, "idsfa":idsfa, "user":userId, "date": Date.now(), "statut":"provisoire" });
+									 } else {
+										 console.log("Already existing");
+									 }
+							 	});	 
+					 		});
+						 }									
+					});
+				}	
+			});	
+		}
+	});
+});
+/*=========================================================================================================================================================================*/
+
 
 /*  FIIIIIIIIN */
 

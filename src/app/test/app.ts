@@ -23,7 +23,7 @@ export class MyDemoApp implements OnInit {
         this.getData();
     }
     getData():void {
-        this._http.get("/api/test2")
+        this._http.get("/api/classificationGMC")
         .map(Classification => <Classification[]>Classification.json())        
          .subscribe(Classification =>{
 	   setTimeout(()=>{ this.Classification = Classification }, 4000),

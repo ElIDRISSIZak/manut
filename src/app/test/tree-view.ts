@@ -44,6 +44,7 @@ export class TreeView implements OnInit {
 	idDropped2 : any;
 	idDragged2:any;
 	color2 : any;
+	arrayFiliale : string [] = [ 'filiale1' , 'Rapide Racking', 'Key' , 'Pichon' , 'Witre' , 'Casal Sport' , 'Ikaros'];
     constructor(private componentResolver: ComponentFactoryResolver,
                 private router: Router, private _http: Http){
 	this.currentUser = JSON.parse(localStorage.getItem("currentUser"));    
@@ -194,7 +195,7 @@ setTimeout(()=>{ cl3.product = this._http.get("/api/sfa/"+cl3.attribut.ID)
 	return this.classification;        
     }
     getDataFiliale():void {
-	if ( ((localStorage.getItem('ifAdmin') == "true")) && (( this.currentUser.structure == "filiale1" ) || ( this.currentUser.structure == "manutan"))) {
+	if ( ((localStorage.getItem('ifAdmin') == "true")) && (( this.arrayFiliale.includes(this.currentUser.structure)) || ( this.currentUser.structure == "manutan"))) {
         this._http.get("/api/xslstest")
         .map(ClassificationFi => <ClassificationFi[]>ClassificationFi.json())        
          .subscribe(ClassificationFi =>{
