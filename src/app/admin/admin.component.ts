@@ -12,7 +12,8 @@ import { User } from '../model/user';
 })
 export class AdminComponent {
   result : any;
-  sfa: any;
+  sfa: any;	
+  data : any;
   public uploader:FileUploader = new FileUploader({url:'/api/upload'});
   currentUser:User;
 	arrayFiliale : string [] = [ 'filiale1' , 'Rapide Racking', 'Key' , 'Pichon' , 'Witre' , 'Casal Sport' , 'Ikaros'];
@@ -33,28 +34,23 @@ export class AdminComponent {
 	if (this.currentUser.structure == "manutan") {
 	
 		for( let item of this.uploader.queue ){
-		if((item.file.name.includes("manutanGMC") && item.file.type == "text/xml" ) && item.isSuccess == true){
+			if((item.file.name.includes("manutanGMC") && item.file.type == "text/xml" ) && item.isSuccess == true){
 		        console.log("GOOOD"); 
 			number++;
 			
-		}
-		else if((item.file.name.includes("manutanSFA") && item.file.type == "text/xml" ) && item.isSuccess == true){
+			}
+			else if((item.file.name.includes("manutanSFA") && item.file.type == "text/xml" ) && item.isSuccess == true){
 		        console.log("GOOOD"); 
 			number++;
 			
-		}
-		/*else if(item.file.name == "Spécification fichier Mapping Tool V0.1.xlsx" && item.isSuccess == true){
-			this._http.get("/api/insertion")
-      			.map(result => this.result = result.json().data)
-			.subscribe(res => this.result = res);
-			alert("EXCEL Bien Chargé !!!!!");
-		}*/
+			}
+		
 
-		else if(item.isSuccess == false){
+			else if(item.isSuccess == false){
 			alert("Erreur : Veuillez charger le fichier tout d'abord");
-		}
+			}
 
-		console.log("=>", this.result);
+			console.log("=>", this.result);
 		}
 		if(number == 2){
 			confirm("Integration données MANUTAN GMC et SFA ");
@@ -68,50 +64,60 @@ export class AdminComponent {
 			window.location.reload();	
 		}else
 			alert("Veuillez charger les deux fichiers MANUTAN GMC et SFA ");
-	}else if(this.currentUser.structure == "filiale1") {
-		//confirm("Integration données de la filiale 1");
+	}else {
+		
+		
 		for( let item of this.uploader.queue ){
-		if(item.file.name == "filiale1.xlsx" && item.isSuccess == true){
-		        console.log("GOOOD"); 
-			alert("Fichier bien chargé");
-		}
-		else if(item.isSuccess == false){
-			alert("Erreur : Veuillez charger le fichier tout d'abord");
-		}
-		else{
-			alert("Erreur : Veuillez charger le fichier de filiale ");
-		}
+			if(item.file.name.includes(this.currentUser.structure) && item.isSuccess == true){
+			let model = {structure : null , filename : null};
+			model.structure = this.currentUser.structure;
+			model.filename = item.file.name;
+			console.log("=>  filename csv =>",model.filename);
+			
+			var headers = new Headers();
+	    		headers.append('content-type','application/json');
 
-		console.log("=>", this.result);
+		        this._http.post('/api/csv', JSON.stringify(model), {headers:headers})
+			.subscribe(data => {
+              		 this.data = data;
+ 				console.log("=> ",this.data._body);
+            			});
+
+				alert("Fichier bien chargé");
+			}else if(item.isSuccess == false){
+				alert("Erreur : Veuillez charger le fichier tout d'abord");
+			}
+			else{
+				alert("Erreur : Veuillez charger le fichier de filiale ");
+			}
+			console.log("=>", this.result);
 		}
-	}else
-		alert("Erreur : Pas d autorisation ");
+	}
+	
 }
     
    uploadAll(){
 	if (this.currentUser.structure == "manutan") {
 		for( let item of this.uploader.queue ){
-		if(item.file.name.includes("filiale1") || item.file.name == "api2.js" || item.file.name == "notImportant.png" ||
+			if(item.file.name.includes("filiale1") || item.file.name == "api2.js" ||
 			(item.file.name.includes("manutanGMC") && item.file.type == "text/xml" ) ||
 			(item.file.name.includes("manutanSFA") && item.file.type == "text/xml" )  ){
 			item.upload();
-			console.log("TYPE => ", item.file.type); 
+			}
+			else{
+				item.isError = true;	
+			}
 		}
-		else{
-			item.isError = true;	
-		}
-	}}
-	else if (this.currentUser.structure == "filiale1"){
+	}else {
 		 
 		for( let item of this.uploader.queue ){
-		console.log("TEST ARRAY FILIALE  => ", this.arrayFiliale.includes(item.file.name)); 
-		if(item.file.name.includes(this.currentUser.structure)){
+			console.log("TEST ARRAY FILIALE  => ", this.arrayFiliale.includes(item.file.name)); 
+			if(item.file.name.includes(this.currentUser.structure)){
 			item.upload();
-		}
-		else{
+			}else{
 			item.isError = true;	
+			}
 		}
-	}
 	}
 	//this.uploader.uploadAll();
    }
@@ -122,7 +128,7 @@ export class AdminComponent {
 	}else{
 		item.isError = true;	
 	}
-	}else if (this.currentUser.structure == "filiale1"){
+	}else if (item.file.name.includes(this.currentUser.structure)){
 		item.upload();
 	}
 	

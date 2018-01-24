@@ -7,6 +7,7 @@ export class ClassificationFi{
     checked:boolean;
     showIcon = false;
     icon = null;
+    lvl = 1;
     
     constructor(name,id, classification) {
         this.name = name;
@@ -16,6 +17,7 @@ export class ClassificationFi{
         this.checked = false;
         this.showIcon = true;
         this.icon = this.getIcon();
+	this.lvl = 1;
     }
     toggle(){
         this.expanded = !this.expanded;

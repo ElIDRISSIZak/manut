@@ -1187,7 +1187,872 @@ router.get('/mappingsfa/:idf/:idsfa/:user', (req, res) => {
 	});
 });
 /*=========================================================================================================================================================================*/
+//SAVE MAPPING ZAKARIA
+router.post('/mappingsfa', cors(), (req, res, next) => {
+    var model = req.body;
+	var idf = model.idf;
+	var idsfa = model.idsfa;
+	var userId = model.username;
+	var structure;
+	var mapped = false;
+    if(!model){
+        res.status(400);
+        res.json({
+            "error":"bad DATA"
+        });
+    }else{
+		db.collection("users").findOne({"username": userId}, function(err, user) {
+		
+		structure = user.structure;
+		if(structure != "manutan"){
+			
+			db.collection(structure).findOne({"ProductID" : idf}, function(err, product) {				
+				console.log(structure);
+				if( product != null) {
+					console.log("product");
+					db.collection('mappingsfa').remove({"idf":idf, "structure": structure});
+					db.collection('mappingsfa').insert({"idf":idf, "idsfa":idsfa, "user":userId, "structure": structure, "date": Date.now(), "statut":"provisoire" });
+				} else {
+					db.collection(structure).distinct("ProductID", {$or : [{"Classificationlevel1ID" : idf}, {"Classificationlevel2ID" : idf}, {"Classificationlevel3ID" : idf}, {"Classificationlevel4ID" : idf}, {"ModelID" : idf}] }, function(err, idproduct) {
+						
+						 if(idproduct != null){
+							 idproduct.forEach((productline) => {
+							 	db.collection('mappingsfa').findOne({"idf" : productline, "structure": structure}, function(err, mapping) {	
+									 console.log(productline);
+									 if (mapping == null){
+										 console.log("insert one");
+										 db.collection('mappingsfa').insert({"idf": productline, "idsfa":idsfa, "user":userId, "structure": structure, "date": Date.now(), "statut":"provisoire" });
+									 } else {
+										 console.log("Already existing");
+									 }
+							 	});	 
+					 		});
+						 }									
+					});
+				}	
+			});	
+		}
+	});
+      
+    }
+      //res.json(mapped);   
+});
+/// INtegration code Johnny 23 Jan Mardi 2018
+/*==================================================================*/
+/*====================Insertion mapping du structure filiale========*/
 
+
+router.get('/filiale/:structure', (req, res) => {
+    
+	var structure = req.params.structure;	
+	var root = [];
+	db.collection("mappingsfa").distinct("idf", {"structure" : structure}, function(err, mapping) {
+    
+		console.log("mapping : ", mapping);	
+		
+		var id1 = 0;
+		var id2 = 0;
+		var id3 = 0;
+		var id4 = 0;
+		var id5 = 0;
+		var classification1 = {};
+		var classification2 = {};
+		var classification3 = {};
+		var idmd9 = 0;
+		db.collection(structure).find({}).sort({ "sorter": 1}, function(err, result) {
+			console.log("Taille result : ", result.length);	
+		result.forEach(function(item){
+      			//console.log("1");
+			console.log(item["Classificationlevel1ID"], "** =================!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!==================**", id1);
+			if(item["Classificationlevel1ID"] != id1){
+				/*if(id1 != 0){
+					root.push(classification1);	
+				}*/
+				classification1= {};
+				classification2= {};
+				classification2.models = [];
+				classification3= {};
+				classification4= {};
+				classification1.id = item["Classificationlevel1ID"];
+				classification1.name = item["Classificationlevel1NAME"];
+				id1 = classification1.id;
+				//classification1.push(id1);	
+				//classification1.push(name);
+				classification1.classification = [];
+				console.log("** =================!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!==================**");
+				if(item["Classificationlevel2ID"] != id2){
+					//console.log("** id2 CHANGE**");
+					classification2.id = item["Classificationlevel2ID"];
+					classification2.name = item["Classificationlevel2NAME"];
+					id2 = item["Classificationlevel2ID"];
+					classification2.classification = [];
+					classification2.models = [];
+
+				     
+					/*if(item["Classification level 3 ID"] != id3){
+						console.log("ID3 ", item["Classification level 3 ID"]);
+						classification3.id = item["Classification level 3 ID"];
+						classification3.name = item["Classification level 3 NAME"];
+						id3 = classification3.id;
+						console.log("** ===> id3 inserted ==**", id3);
+						classification2.classification.push(classification3);
+					}*/
+
+					//classification2.push(id2);
+					//classification2.push(item["Classification level 2 NAME"]);
+												
+					classification1.classification.push(classification2);
+					console.log("** ==================================================================**");
+					root.push(classification1);
+					classification2= {};
+					//classification1= {};
+					//root.push(classification1);
+				}else
+					console.log("** ===> id1 id2 ==**");
+					/*if(item["Classification level 3 ID"] != id3){
+						console.log("** id2 changed ", item["Classification level 3 ID"]);
+						classification3.id = item["Classification level 3 ID"];
+						classification3.name = item["Classification level 3 NAME"];
+						id3 = classification3.id;
+						
+						classification2.classification.push(classification3);
+					}*/
+					//root.push(classification1);
+					//classification1= {};	
+				
+			}else{
+				if(item["Classificationlevel2ID"] != id2){
+					classification2.id = item["Classificationlevel2ID"];
+					classification2.name = item["Classificationlevel2NAME"];
+					id2 = classification2.id;
+					classification2.classification = [];
+					classification2.models = [];
+					
+					/*if(item["Classification level 3 ID"] != id3){
+						console.log("ID3 ", item["Classification level 3 ID"]);
+						classification3.id = item["Classification level 3 ID"];
+						classification3.name = item["Classification level 3 NAME"];
+						id3 = classification3.id;
+						
+						classification2.classification.push(classification3);
+					}*/
+					//classification2.push(id2);
+					//classification2.push(item["Classification level 2 NAME"]);
+
+					classification1.classification.push(classification2);
+					//root.push(classification1);
+					classification2= {};
+				}
+			}  
+		});
+		//MODELS FOR LEVEL 2
+		var idmd10 = 0;
+		var idp = 0;
+		idattr1 = 0;
+		idattr2 = 0;
+		idattr3 = 0;
+console.log("Taille result 2: ", result.length);	
+		result.forEach(function(item){
+			//console.log("** TEST**");
+			
+			root.forEach(function(item10){
+			var cll = item10.classification;	
+			//classification3.models = [];
+				model= {};
+				model.products = [];
+			cll.forEach(function(item11){
+			if((item["Classificationlevel2ID"] == item11.id)&&(item["ModelID"] != "-") && (idmd10 != item["ModelID"]) && ("-" == item["ClassificationlevelID"])){
+								console.log("for cl2 =>  **",idmd2 );
+								model.id = item["ModelID"];
+								model.name = item["ModelNAME"];
+								idmd10 = item["ModelID"];
+								//classification4.models.push(model);
+								item11.models.push(model);
+								console.log("Niv 2=>",item11.id);
+				}
+			
+			var prods = item11.models;
+			product= {};
+			product.techattrs = [];
+					prods.forEach(function(it){
+						console.log("PROD N1 => ", idp );
+						if((item["ModelID"] == it.id)&&(item["ProductID"] != "-") 
+							&& (idp != item["ProductID"])){
+								console.log("Product  **",idp );
+								product.id = item["ProductID"];
+								product.name = item["ProductNAME"];
+								product.shortdesc = item["short description"];
+								product.longdesc = item["long description"];
+								idp = item["Product ID"];
+								if(mapping.indexOf(product.id) > -1){
+											console.log(" find mapped ");
+											product.mapped = "true";
+											console.log(product.mapped);		
+								}
+								//classification4.models.push(model);
+								it.products.push(product);
+								console.log("=>",it.id);
+							}
+							//Technical attribut ID
+					var techattrs = it.products;
+					techattr = {};
+					
+					techattrs.forEach(function(tech){
+						console.log("ATTR N1 => ", idattr1 );
+						if((item["ProductID"] == tech.id)&&(item["Technical attribut ID"] != "-") 
+							&& (idattr1 != item["TechnicalattributID"])){
+								console.log("ATTRIBUT   **",idattr1 );
+								techattr.id = item["TechnicalattributID"];
+								techattr.name = item["TechnicalattributNAME"];
+								techattr.value = item["TechnicalattributVALUE"];
+								techattr.unit = item["TechnicalattributUNIT"];
+								idattr1 = item["TechnicalattributID"];
+								//classification4.models.push(model);
+								tech.techattrs.push(techattr);
+								console.log("ATT saved=>",tech.id);
+						}
+					});
+
+					//FIN iteration
+
+			});
+
+			});
+			});
+		});
+		var idcsv = 0;
+		var idmd = 0;
+		var idmd2 = 0;
+		var idmd3 = 0;
+		var idprod = 0;
+		var idprod1 = 0;
+		var idprod2 = 0;
+console.log("Taille result 3: ", result.length);	
+		result.forEach(function(item){
+			//console.log("** TEST**");
+			idcsv++;
+			root.forEach(function(item2){
+				var iditem2 = 0;
+				classification3= {};
+				classification3.classification = [];
+				classification3.models = [];
+				model= {};
+				model.products = [];
+				var cl = item2.classification;
+				cl.forEach(function(item3){
+					if((iditem2 ==0 ) && (idcsv == 1)){
+						console.log("** ITEM  **",item3.id);
+						iditem2++;
+					}
+					
+					if((item["Classificationlevel2ID"] == item3.id) && (id3 != item["Classificationlevel3ID"]) && ("-" != 	item["Classificationlevel3ID"])){
+						console.log("** INSERT HERE  **",item3.id);
+						classification3.id = item["Classificationlevel3ID"];
+						classification3.name = item["Classificationlevel3NAME"];
+						id3 = item["Classificationlevel3ID"];
+						item3.classification.push(classification3);
+					}
+					/*else if((item["Classification level 2 ID"] == item3.id) &&
+						 (id3 != item["Classification level 3 ID"]) &&
+					 	("-" == item["Classification level 3 ID"])){
+						
+						model.id = item["Model ID"];
+						model.name = item["Model NAME"];
+						id3 = item["Classification level 3 ID"];
+						item3.products.push(classification3);
+					}*/
+
+//MODELS
+					model2= {};
+					model2.products = [];
+					var md2 = item3.classification;
+					
+					md2.forEach(function(item8){
+						
+						if((item["Classificationlevel3ID"] == item8.id)&&(item["ModelID"] != "-") && (idmd2 != item["ModelID"])){
+								console.log("M **",idmd2 );
+								model2.id = item["ModelID"];
+								model2.name = item["ModelNAME"];
+								idmd2 = item["ModelID"];
+								//classification4.models.push(model);
+								item8.models.push(model2);
+								console.log("Niv 3=>",item8.id);
+							}
+					
+						var prods2 = item8.models;
+						product2= {};
+						product2.techattrs = [];
+						prods2.forEach(function(item9){
+						console.log("TEST" );
+						if((item["ModelID"] == item9.id)&&(item["ProductID"] != "-") 
+							&& (idprod2 != item["ProductID"])){
+								console.log("Product  **",idprod2 );
+								product2.id = item["ProductID"];
+								product2.name = item["ProductNAME"];
+								product2.shortdesc = item["shortdescription"];
+								product2.longdesc = item["longdescription"];
+								idprod2 = item["ProductID"];
+								if(mapping.indexOf(product2.id) > -1){
+											console.log(" find mapped ");
+											product2.mapped = "true";
+											console.log(product2.mapped);		
+								}
+								//classification4.models.push(model);
+								item9.products.push(product2);
+								console.log("=>",item9.id);
+							}
+				//Technical attribut ID
+					var techattrs = item9.products;
+					techattr = {};
+					
+					techattrs.forEach(function(tech){
+						console.log("ATTR LEV3 => ", idattr2 );
+						if((item["ProductID"] == tech.id)&&(item["TechnicalattributID"] != "-") 
+							&& (idattr2 != item["TechnicalattributID"])){
+								console.log("ATTRIBUT   **",idattr2 );
+								techattr.id = item["TechnicalattributID"];
+								techattr.name = item["TechnicalattributNAME"];
+								techattr.value = item["TechnicalattributVALUE"];
+								techattr.unit = item["TechnicalattributUNIT"];
+								idattr2 = item["TechnicalattributID"];
+								//classification4.models.push(model);
+								tech.techattrs.push(techattr);
+								console.log("ATT saved=>",tech.id);
+						}
+					});
+
+					//FIN iteration
+
+					});
+
+
+					});
+
+//MODELS			
+					classification4= {};
+					classification4.models = [];
+					var cl2 = item3.classification;
+					
+					cl2.forEach(function(item4){
+						
+						
+						
+						if((item["Classificationlevel3ID"] == item4.id) && ("-" != item["Classificationlevel4ID"])){
+							/*if( id4 == 0){
+								classification4.classification = [];
+							}*/						
+							//console.log("** ID4 **",item["Classification level 4 ID"]);
+							classification4.id = item["Classificationlevel4ID"];
+							classification4.name = item["Classificationlevel4NAME"];
+							
+							/*if((item["Model ID"] != "-") && (idmd != item["Model ID"])){
+								
+								model.id = item["Model ID"];
+								model.name = item["Model NAME"];
+								idmd = item["Model ID"];
+								classification4.models.push(model);
+								console.log("M **",item["Model ID"]);
+							}*/
+							if(item4.classification && (id4 != item["Classificationlevel4ID"])){
+								item4.classification.push(classification4);
+								//console.log("** ID4 PUSH **", id4);	
+							}	
+							
+							id4 = item["Classificationlevel4ID"];
+						}
+					model= {};
+					model.products = [];
+					var md1 = item4.classification;
+					
+					md1.forEach(function(item6){
+						
+						if((item["Classificationlevel4ID"] == item6.id)&&(item["ModelID"] != "-") && (idmd != item["ModelID"])){
+								console.log("M **",idmd );
+								model.id = item["ModelID"];
+								model.name = item["ModelNAME"];
+								idmd = item["ModelID"];
+								//classification4.models.push(model);
+								item6.models.push(model);
+								console.log("66=>",item6.id);
+							}
+					
+						var prods = item6.models;
+						product= {};
+						product.techattrs = [];
+					prods.forEach(function(item7){
+						console.log("TEST" );
+						if((item["ModelID"] == item7.id)&&(item["ProductID"] != "-") 
+							&& (idprod != item["ProductID"])){
+								console.log("Product  **",idprod );
+								product.id = item["ProductID"];
+								product.name = item["ProductNAME"];
+								product.shortdesc = item["shortdescription"];
+								product.longdesc = item["longdescription"];
+								idprod = item["ProductID"];
+								if(mapping.indexOf(product.id) > -1){
+											console.log(" find mapped ");
+											product.mapped = "true";
+											console.log(product.mapped);		
+								}
+								//classification4.models.push(model);
+								item7.products.push(product);
+								console.log("=>",item7.id);
+								
+							}
+						//Technical attribut ID
+					var techattrs = item7.products;
+					techattr = {};
+					
+					techattrs.forEach(function(tech){
+						console.log("ATTR LEV3 => ", idattr3 );
+						if((item["ProductID"] == tech.id)&&(item["TechnicalattributID"] != "-") 
+							&& (idattr3 != item["TechnicalattributID"])){
+								console.log("ATTRIBUT LEV 4   **",idattr3 );
+								techattr.id = item["TechnicalattributID"];
+								techattr.name = item["TechnicalattributNAME"];
+								techattr.value = item["TechnicalattributVALUE"];
+								techattr.unit = item["TechnicalattributUNIT"];
+								idattr3 = item["TechnicalattributID"];
+								//classification4.models.push(model);
+								tech.techattrs.push(techattr);
+								console.log("ATT saved=>",tech.id);
+						}
+					});
+
+					//FIN iteration
+					});
+
+
+					});
+
+					/*// Integration Model and Products
+					model= {};
+					model.products = [];
+					var mdl = item4.classification;
+					
+					mdl.forEach(function(item5){
+						
+						if((item["Classification level 4 ID"] == item5.id) && (id5 != item["Model ID"])
+							&& ("-" != item["Model ID"])){
+													
+							console.log("** ID MODEL **",item["Model ID"]);
+							model.id = item["Model ID"];
+							model.name = item["Model NAME"];
+							console.log("**MODEL **",model);
+							
+							if(item5.models && (id5 != item["Model ID"])){
+								item5.models.push(model);
+								console.log("** ID4 PUSH **", id5);	
+							}
+							
+							id5 = item["Model ID"];
+						}
+					// Integration Model and Products
+						
+						
+					});*/
+					
+	
+					});
+					
+					/*if((item["Classification level 3 ID"] == item3.id) && (id3 != item["Classification level 3 ID"])){
+
+						classification3.id = item["Classification level 3 ID"];
+						classification3.name = item["Classification level 3 NAME"];
+						id3 = item["Classification level 3 ID"];
+						item3.classification.push(classification3);
+					}*/
+				});
+				
+				/*if(item["Classification level 2 ID"] == item2){
+					console.log("** id2 changed ", item["Classification level 3 ID"]);
+					classification3.id = item["Classification level 3 ID"];
+					classification3.name = item["Classification level 3 NAME"];
+					id3 = classification3.id;
+					
+					classification2.classification.push(classification3);
+				}*/
+				
+			});
+						
+		});
+	
+
+	// MODELS ICI apres qu on a terminé iteration des CLASSIFICATIONS
+
+
+	
+			
+	//result.forEach(function(item){
+		//console.log("** TEST => rooot class**");
+		/*var idtest= 0;
+		var idclassif =0
+		root.forEach(function(item2){
+			var id_model = 0;
+			var idnbr = 0;
+			model= {};
+			model.products = [];
+			
+			var cl = item2.classification;
+				//item3.models
+
+			
+			var poitem = 0;
+			
+			cl.forEach(function(item3){
+				poitem =  item3.id;
+				
+				item3.models = [];
+				if (typeof item3.classification == 'undefined' || item3.classification.length == 0) {
+    					// the array is EMPTY
+					//item3.models = [];
+					idnbr++;
+					//console.log("** empty level => **", item3.id);
+					console.log("++++");
+					result.forEach(function(item){
+					    if( (item3.id ==  item["Classification level 2 ID"]) && (idtest !=  item["Classification level 2 ID"])){
+						//if((idtest !=  item["Classification level 1 ID"])){
+							console.log("------");
+							model.id = item["Model ID"];
+							model.name = item["Model NAME"];
+							id_model = item["Model ID"];
+							idtest = item["Classification level 2 ID"];			
+							item3.models.push(model);
+							console.log("** level => **", item3.id);
+							idtest = item["Classification level 1 ID"];
+							console.log("** ID =*", idtest);
+						//}
+					    }
+					});
+					
+				}
+										
+			});
+			
+
+		
+	});*/
+	/*var idtest= 0;
+	var idclassif =0
+	result.forEach(function(item){
+		//console.log("** TEST => rooot class**");
+		if(item["Classification level 3 ID"] == "-"){
+		
+		     root.forEach(function(item2){
+			if(item["Classification level 2 ID"] == item2.classification){
+		     });
+		}
+	
+	});*/
+
+		//setTimeout(() => {
+            res.json(root);
+        //},1000); 
+});
+	
+		
+	});
+
+
+
+});
+
+/*==================================================================*/
+
+router.get('/filialebak/:structure', (req, res) => {
+    
+	var structure = req.params.structure;	
+
+	db.collection("mappingsfa").distinct("idf", {"structure" : structure}, function(err, mapping) {
+		
+		root = [];
+		var id1 = 0;
+		var id2 = 0;
+		var id3 = 0;
+		var id4 = 0;
+		var id5 = 0;
+		var classification1 = {};
+		var classification2 = {};
+		var classification3 = {};
+		var idmd9 = 0;
+		db.collection(structure).find({}, function(err, result) {
+		result.forEach((item) => {
+			
+			if(item["Classificationlevel1ID"] != id1){
+
+				classification1= {};
+				classification2= {};
+				classification2.models = [];
+				classification3= {};
+				classification4= {};
+				classification1.id = item["Classificationlevel1ID"];
+				classification1.name = item["Classificationlevel1NAME"];
+				id1 = classification1.id;
+				classification1.classification = [];
+				if(item["Classificationlevel2ID"] != id2){
+					classification2.id = item["Classificationlevel2ID"];
+					classification2.name = item["Classificationlevel2NAME"];
+					id2 = item["Classificationlevel2ID"];
+					classification2.classification = [];
+					classification2.models = [];
+					classification1.classification.push(classification2);
+					
+					root.push(classification1);
+					classification2= {};
+				}else
+					console.log("** ===> id1 id2 ==**");
+				}else{
+					if(item["Classificationlevel2ID"] != id2){
+						classification2.id = item["Classificationlevel2ID"];
+						classification2.name = item["Classificationlevel2NAME"];
+						id2 = classification2.id;
+						classification2.classification = [];
+						classification2.models = [];
+						classification1.classification.push(classification2);
+						classification2= {};
+					}
+				}  
+			});
+		
+		//MODELS FOR LEVEL 2
+		var idmd10 = 0;
+		var idp = 0;
+		idattr1 = 0;
+		idattr2 = 0;
+		idattr3 = 0;
+		result.forEach(function(item){
+			
+			root.forEach(function(item10){
+				var cll = item10.classification;	
+				model= {};
+				model.products = [];
+				cll.forEach(function(item11){
+				if((item["Classificationlevel2ID"] == item11.id)&&(item["ModelID"] != "-") && (idmd10 != item["ModelID"]) && ("-" == item["Classificationlevel3ID"])){
+					console.log("for cl2 =>  **",idmd2 );
+					model.id = item["ModelID"];
+					model.name = item["ModelNAME"];
+					idmd10 = item["ModelID"];
+					item11.models.push(model);
+					console.log("Niv 2=>",item11.id);
+				}
+			
+				var prods = item11.models;
+				product= {};
+					prods.forEach(function(it){
+						console.log("PROD N1 => ", idp );
+						if((item["ModelID"] == it.id)&&(item["ProductID"] != "-") && (idp != item["ProductID"])){
+							console.log("Product  **",idp );
+							product.id = item["ProductID"];
+							product.name = item["ProductNAME"];
+							idp = item["ProductID"];
+							it.products.push(product);
+							console.log("=>",it.id);
+							
+							if(mapping.indexOf(product.id) > -1){
+										console.log(" find mapped ");
+										product.mapped = "true";
+										console.log(product.mapped);		
+							}	
+						
+						}
+					});
+				});
+			});
+		});////////////////////////////////////////////
+		
+		var idcsv = 0;
+		var idmd = 0;
+		var idmd2 = 0;
+		var idmd3 = 0;
+		var idprod = 0;
+		var idprod1 = 0;
+		var idprod2 = 0;
+		result.forEach(function(item){
+			idcsv++;
+			root.forEach(function(item2){
+				var iditem2 = 0;
+				classification3= {};
+				classification3.classification = [];
+				classification3.models = [];
+				model= {};
+				model.products = [];
+				var cl = item2.classification;
+				cl.forEach(function(item3){
+					if((iditem2 ==0 ) && (idcsv == 1)){
+						console.log("** ITEM  **",item3.id);
+						iditem2++;
+					}
+					
+					if((item["Classificationlevel2ID"] == item3.id) && (id3 != item["Classificationlevel3ID"]) && ("-" != item["Classificationlevel3ID"])){
+						console.log("** INSERT HERE  **",item3.id);
+						classification3.id = item["Classificationlevel3ID"];
+						classification3.name = item["Classificationlevel3NAME"];
+						id3 = item["Classificationlevel3ID"];
+						item3.classification.push(classification3);
+					}
+
+
+//MODELS
+					model2= {};
+					model2.products = [];
+					var md2 = item3.classification;
+					
+					md2.forEach(function(item8){
+						
+						if((item["Classificationlevel3ID"] == item8.id)&&(item["ModelID"] != "-") && (idmd2 != item["ModelID"])){
+								console.log("M **",idmd2 );
+								model2.id = item["ModelID"];
+								model2.name = item["ModelNAME"];
+								idmd2 = item["ModelID"];
+								item8.models.push(model2);
+								console.log("Niv 3=>",item8.id);
+						}
+					
+						var prods2 = item8.models;
+						product2 = {};
+						prods2.forEach(function(item9){
+							console.log("TEST Prod" );
+							if((item["ModelID"] == item9.id)&&(item["ProductID"] != "-") && (idprod2 != item["ProductID"])){
+								
+									console.log("Product test **",idprod2 );
+									product2.id = item["ProductID"];
+									product2.name = item["ProductNAME"];
+									idprod2 = item["ProductID"];
+									console.log(product2.id);
+									
+									if(mapping.indexOf(product2.id) > -1){
+										console.log(" find mapped ");
+										product2.mapped = "true";
+										console.log(product2.mapped);	
+									}	
+						
+									console.log("test");
+									item9.products.push(product2);
+									
+									console.log("=>",item9.id);
+							}
+						});
+					});
+
+//MODELS			
+					classification4= {};
+					classification4.models = [];
+					var cl2 = item3.classification;
+					
+					cl2.forEach(function(item4){
+						
+						
+						
+						if((item["Classificationlevel3ID"] == item4.id) && ("-" != item["Classificationlevel4ID"])){
+
+							classification4.id = item["Classificationlevel4ID"];
+							classification4.name = item["Classificationlevel4NAME"];
+
+							if(item4.classification && (id4 != item["Classificationlevel4ID"])){
+								item4.classification.push(classification4);
+							}	
+							
+							id4 = item["Classificationlevel4ID"];
+						}
+						model= {};
+						model.products = [];
+						var md1 = item4.classification;
+						
+						md1.forEach(function(item6){
+							
+							if((item["Classificationlevel4ID"] == item6.id)&&(item["ModelID"] != "-") && (idmd != item["ModelID"])){
+									console.log("M **",idmd );
+									model.id = item["ModelID"];
+									model.name = item["ModelNAME"];
+									idmd = item["ModelID"];
+									item6.models.push(model);
+									console.log("66=>",item6.id);
+								}
+						
+							var prods = item6.models;
+							product= {};
+							prods.forEach(function(item7){
+								console.log("TEST" );
+								if((item["ModelID"] == item7.id)&&(item["ProductID"] != "-") 
+									&& (idprod != item["ProductID"])){
+										console.log("Product  **",idprod );
+										product.id = item["ProductID"];
+										product.name = item["ProductNAME"];
+										idprod = item["ProductID"];
+										item7.products.push(product);
+										console.log("=>",item7.id);
+										
+										if(mapping.indexOf(product.id) > -1){
+										console.log(" find mapped ");
+										product.mapped = "true";
+										console.log(product.mapped);
+										}	
+									}
+								});
+							});
+						});
+					});				
+				});						
+			});
+		//setTimeout(() => {
+            res.json(root);
+        //},1000); 
+		});
+	});
+});
+
+
+/*==================================================================*/
+/*===========Insertion avec nom de la structure extension===========*/
+/*==================================================================*/
+//FCT
+function getFileExtension3(filename) {
+      return filename.slice((filename.lastIndexOf(".csv") - 1 >>> 0) + 2);
+    }
+
+// csv to json 
+router.post('/csv', cors(), (req, res, next) => {
+	 var model = req.body;
+    	var filename = model.filename;
+	var structure = model.structure;
+	console.log("test csv", structure, "=> name",filename);
+	if( getFileExtension3(filename) == 'csv' && filename.startsWith(structure)) {
+
+	   //console.log(json);
+	   var fs = require('fs');
+	   		
+	   var fileInputName = 'uploads/' + filename; 
+	   var fileOutputName = 'uploads/output.json';
+	         
+	   csvToJson.generateJsonFileFromCsv(fileInputName,fileOutputName);
+	   fs.readFile(fileOutputName, 'utf8', function (erreur, donnees) {
+	         if (erreur)
+	            throw erreur; // Vous pouvez gérer les erreurs avant de parser le JSON
+	         var filiales1 = JSON.parse(donnees);
+			 
+			cpt = 0;
+		    connection((db) => {
+		        db.collection(structure).deleteMany({}, function(err, mapping) {
+
+				filiales1.forEach((objf1) => {
+	            	objf1.sorter = cpt;
+	            	
+            		db.collection(structure).insert(objf1, {safe: true});
+			cpt++;
+
+	         }); 
+
+			});
+		    });
+			
+			
+	         
+	            
+	     }); 
+	};
+	res.json("file inserted"); 
+ });
+// code 23 janvier Mardi 2018
 
 /*  FIIIIIIIIN */
 

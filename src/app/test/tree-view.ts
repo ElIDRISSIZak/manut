@@ -4,7 +4,7 @@ import {Classification} from './classification';
 import {ClassificationFi} from './classification-fi';
 
 import { Router } from '@angular/router';
-import { Http, Headers, RequestOptions } from '@angular/http';
+import { Http, Headers, RequestOptions, URLSearchParams } from '@angular/http';
 
 import { User } from '../model/user';
 import {Observable} from 'rxjs/Observable';
@@ -44,6 +44,7 @@ export class TreeView implements OnInit {
 	idDropped2 : any;
 	idDragged2:any;
 	color2 : any;
+	data: any;
 	arrayFiliale : string [] = [ 'filiale1' , 'Rapide Racking', 'Key' , 'Pichon' , 'Witre' , 'Casal Sport' , 'Ikaros'];
     constructor(private componentResolver: ComponentFactoryResolver,
                 private router: Router, private _http: Http){
@@ -196,7 +197,7 @@ setTimeout(()=>{ cl3.product = this._http.get("/api/sfa/"+cl3.attribut.ID)
     }
     getDataFiliale():void {
 	if ( ((localStorage.getItem('ifAdmin') == "true")) && (( this.arrayFiliale.includes(this.currentUser.structure)) || ( this.currentUser.structure == "manutan"))) {
-        this._http.get("/api/xslstest")
+        this._http.get('/api/filiale/'+this.currentUser.structure)
         .map(ClassificationFi => <ClassificationFi[]>ClassificationFi.json())        
          .subscribe(ClassificationFi =>{
 	   setTimeout(()=>{ this.ClassificationFi = ClassificationFi }, 3000),
@@ -220,6 +221,7 @@ setTimeout(()=>{ cl3.product = this._http.get("/api/sfa/"+cl3.attribut.ID)
            cl.checked = false;
            cl.showIcon = true;
            cl.icon = '+';
+	   cl.lvl = 1;
        	   console.log("TEST F",cl);
 	   console.log("CL =>",cl.classification);		
            for( let cl2 of cl.classification){
@@ -228,6 +230,7 @@ setTimeout(()=>{ cl3.product = this._http.get("/api/sfa/"+cl3.attribut.ID)
                cl2.checked = false;
                cl2.showIcon = true;
                cl2.icon = '+';
+		cl2.lvl = 2;
 		if(cl2.models){
                    			for( let cl22 of cl2.models){
                    				cl22.expanded = false;
@@ -258,6 +261,7 @@ setTimeout(()=>{ cl3.product = this._http.get("/api/sfa/"+cl3.attribut.ID)
                    cl3.checked = false;
                    cl3.showIcon = true;
                    cl3.icon = '+';
+		   cl3.lvl = 3;
 		   if(cl3.models){
                    			for( let cl33 of cl3.models){
                    				cl33.expanded = false;
@@ -288,6 +292,7 @@ setTimeout(()=>{ cl3.product = this._http.get("/api/sfa/"+cl3.attribut.ID)
                    		cl4.checked = false;
                    		cl4.showIcon = true;
                   	 	cl4.icon = '+';
+				cl4.lvl = 4;
 				if(cl4.models){
                    			for( let cl5 of cl4.models){
                    				cl5.expanded = false;
@@ -343,17 +348,148 @@ setTimeout(()=>{ cl3.product = this._http.get("/api/sfa/"+cl3.attribut.ID)
 // Mapping Produit TO SFA
 transferDataSuccess($event: any , att: any) {
         alert("GOOOOOOOOOOOOOD");
+		/*if($event.dragData.techattrs){
+			if($event.dragData.techattrs.length > 0){
+				console.log("=> PROD ", $event.dragData );
+				let idf = $event.dragData.id;	
+				this._http.get("/api/mappingsfa/"+idf+"/"+att+"/"+this.currentUser.username);
+				console.log("prod inserted==> ", $event.dragData.name);
+			}
+		}else if($event.dragData.products){
+			if($event.dragData.products.length > 0){
+			for( let prod1 of $event.dragData.products){				
+				console.log("=> PROD ", prod1 );
+				let idf = prod1.id;	
+				this._http.get("/api/mappingsfa/"+idf+"/"+att+"/"+this.currentUser.username);
+				console.log("prod inserted  ==> ", prod1.name);	
+			}
+			}
+							
+		}*/
+		console.log("=> selcted ", $event.dragData );
+		if($event.dragData.products){
+			 if($event.dragData.products.length > 0){
+				console.log("rentre dans MODELS ");
+				///////////////////////////////////////////
+				for( let prod of $event.dragData.products){
+                   					prod.mapped = true;
+							console.log("=> PROD MAPp from model", prod );
+				}
+			}
+		}else if($event.dragData.models){
+			 
+		if($event.dragData.classification){
+			 if($event.dragData.classification.length > 0){
+				
+				for( let cl of $event.dragData.classification){
+                   			if(cl.models.length > 0){
+
+						for( let model of cl.models){
+							if(model.products.length > 0){
+								for( let prod of model.products){
+                   							prod.mapped = true;
+									console.log("=> PROD MAPp from last classif", prod );
+								}
+							}	
+                   					
+						}
+					}else if(cl.classification.length > 0){
+						if(cl.classification.length > 0){	
+						for( let cl2 of cl.classification){
+							if(cl2.models.length > 0){
+							for( let model of cl2.models){
+							if(model.products.length > 0){
+								for( let prod of model.products){
+                   							prod.mapped = true;
+									console.log("=> PROD MAPp from last classif", prod );
+								}
+							}	
+                   					}
+							}
+						}}
+					}
+
+				}
+			}
+			}} 
+
+
+
+			else if($event.dragData.models.length > 0){
+				
+				for( let model of $event.dragData.models){
+                   			if(model.products.length > 0){
+
+						for( let prod of model.products){
+                   					prod.mapped = true;
+							console.log("=> PROD MAPp from last classif", prod );
+						}
+					}
+
+				}
+			}
+			
+		/*}else if($event.dragData.classification){
+			 if($event.dragData.classification.length > 0){
+				
+				for( let cl of $event.dragData.classification){
+                   			if(cl.models.length > 0){
+
+						for( let model of cl.models){
+							if(model.products.length > 0){
+								for( let prod of model.products){
+                   							prod.mapped = true;
+									console.log("=> PROD MAPp from last classif", prod );
+								}
+							}	
+                   					
+						}
+					}
+
+				}
+			}
+		} */
+ 
+		
+	
         this.test = true;
-	 let mapp = {classification_id : null , sfa : null , status : "en cours"};
-	mapp.classification_id = $event.dragData;
-	mapp.sfa = att;
-	mapp.status = 'en cours';
-        this.receivedData.push(mapp);
+	 let mapp = {idf : null , idsfa : null , username : null};
+	mapp.idf = $event.dragData.id;
+	mapp.idsfa = att.attribut.ID;
+	mapp.username = this.currentUser.username;
+        //this.receivedData.push(mapp);
 	this.color = 'cyan';
-	this.idDragged = $event.dragData;
-	this.idDropped = att;
-	this.selected = "Mapping success : classification : "+ mapp.classification_id +" attribut: "+ mapp.sfa+" status : "+mapp.status; 
-        console.log("cc",this.receivedData);
+	this.idDragged = $event.dragData.id;
+	this.idDropped = att.attribut.ID;
+	this.selected = "Mapping success : classification : "+ mapp.idf +" attribut: "+ mapp.idsfa; 
+
+	let myparams = new URLSearchParams();
+	myparams.append('idf', $event.dragData.id);
+	myparams.append('idsfa', att.attribut.ID);
+	myparams.append('user', this.currentUser.username);
+	let myHeaders = new Headers();
+	myHeaders.append('Content-Type', 'application/json');
+	let options = new RequestOptions({headers: myHeaders , params: myparams });
+	
+	var headers = new Headers();
+    	headers.append('content-type','application/json');
+
+	$event.dragData.mapped = true;
+	att.mapped = true;
+    	this._http.post('/api/mappingsfa', JSON.stringify(mapp), {headers:headers})
+	.subscribe(data => {
+               this.data = data;
+ 		console.log("=> ",this.data._body);
+		/*if(this.data._body == "true"){
+			
+		} */
+                
+            });
+
+
+	/*this._http.post('/api/mappingsfa/',this.idDragged+'/'+att.attribut.ID+'/'+this.currentUser.username);
+	this._http.get("/api/mappingsfa/"+this.idDragged+"/"+att.attribut.ID+"/"+this.currentUser.username);*/
+        //console.log("/api/mappingsfa/"+mapp);
     }	
 getSelectedNode(id:any, name: any){
 	this.selected = null;
