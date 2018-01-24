@@ -343,10 +343,20 @@ setTimeout(()=>{ cl3.product = this._http.get("/api/sfa/"+cl3.attribut.ID)
      }
 // Mapping Produit TO SFA
 transferDataSuccess($event: any , att: any) {
-        alert("GOOOOOOOOOOOOOD");
+        
+		if(window.confirm('Vous allez mapper '+ $event.dragData.name+ 'avec la SFA: '+ att.name+ 'Confirmer le mapping ?')){
+
+			
 		
 		console.log("=> selcted ", $event.dragData );
-		if($event.dragData.products){
+		if($event.dragData.techattrs){
+			 //if($event.dragData.techattrs.length > 0){
+                   					$event.dragData.mapped = true;
+							console.log("=> PROD MAPPED ", $event.dragData );
+				
+			//}
+		}
+		else if($event.dragData.products){
 			 if($event.dragData.products.length > 0){
 				console.log("rentre dans MODELS ");
 				///////////////////////////////////////////
@@ -370,8 +380,8 @@ transferDataSuccess($event: any , att: any) {
 					if(cl.classification.length > 0){
 						if(cl.classification.length > 0){	
 						for( let cl2 of cl.classification){
-
-							if(cl2.classification.length > 0){	
+							if(cl2.classification){
+								if(cl2.classification.length > 0){	
 								for( let cl3 of cl2.classification){
 									console.log("=> classif", cl3 );
 								if(cl3.models.length > 0){
@@ -386,18 +396,19 @@ transferDataSuccess($event: any , att: any) {
 								}	
 
 								}	
-							}
-							else if(cl2.models.length > 0){
-								for( let model of cl2.models){
-								if(model.products.length > 0){
-									for( let prod of model.products){
-                   							prod.mapped = true;
-									console.log("=> PROD MAPp from last classif", prod );
-									}
-								}	
-                   						}
-							}
-						}}
+								}
+							}else if(cl2.models){
+								if(cl2.models.length > 0){
+									for( let model of cl2.models){
+										if(model.products.length > 0){
+											for( let prod of model.products){
+                   									prod.mapped = true;
+											console.log("=> PROD MAPp from last classif", prod );
+											}
+										}	
+                   							}
+								}
+						}}}
 					}
 					
 					else if(cl.models.length > 0){
@@ -420,7 +431,7 @@ transferDataSuccess($event: any , att: any) {
 
 
 
-			else if($event.dragData.models.length > 0){
+			/*else if($event.dragData.models.length > 0){
 				
 				for( let model of $event.dragData.models){
                    			if(model.products.length > 0){
@@ -432,7 +443,7 @@ transferDataSuccess($event: any , att: any) {
 					}
 
 				}
-			}
+			}*/
 			
 		/*}else if($event.dragData.classification){
 			 if($event.dragData.classification.length > 0){
@@ -466,15 +477,7 @@ transferDataSuccess($event: any , att: any) {
 	this.color = 'cyan';
 	this.idDragged = $event.dragData.id;
 	this.idDropped = att.attribut.ID;
-	this.selected = "Mapping success : classification : "+ mapp.idf +" attribut: "+ mapp.idsfa; 
-
-	let myparams = new URLSearchParams();
-	myparams.append('idf', $event.dragData.id);
-	myparams.append('idsfa', att.attribut.ID);
-	myparams.append('user', this.currentUser.username);
-	let myHeaders = new Headers();
-	myHeaders.append('Content-Type', 'application/json');
-	let options = new RequestOptions({headers: myHeaders , params: myparams });
+	this.selected = "Mapping success : classification : "+ mapp.idf +" attribut: "+ mapp.idsfa;
 	
 	var headers = new Headers();
     	headers.append('content-type','application/json');
@@ -491,10 +494,7 @@ transferDataSuccess($event: any , att: any) {
                 
             });
 
-
-	/*this._http.post('/api/mappingsfa/',this.idDragged+'/'+att.attribut.ID+'/'+this.currentUser.username);
-	this._http.get("/api/mappingsfa/"+this.idDragged+"/"+att.attribut.ID+"/"+this.currentUser.username);*/
-        //console.log("/api/mappingsfa/"+mapp);
+	}
     }	
 getSelectedNode(id:any, name: any){
 	this.selected = null;
