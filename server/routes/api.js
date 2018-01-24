@@ -1361,7 +1361,7 @@ console.log("Taille result 2: ", result.length);
 				model= {};
 				model.products = [];
 			cll.forEach(function(item11){
-			if((item["Classificationlevel2ID"] == item11.id)&&(item["ModelID"] != "-") && (idmd10 != item["ModelID"]) && ("-" == item["ClassificationlevelID"])){
+			if((item["Classificationlevel2ID"] == item11.id)&&(item["ModelID"] != "-") && (idmd10 != item["ModelID"]) && ("-" == item["Classificationlevel3ID"])){//////////////////////
 								console.log("for cl2 =>  **",idmd2 );
 								model.id = item["ModelID"];
 								model.name = item["ModelNAME"];

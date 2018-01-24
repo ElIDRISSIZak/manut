@@ -113,24 +113,25 @@ export class AdminComponent {
 		for( let item of this.uploader.queue ){
 			console.log("TEST ARRAY FILIALE  => ", this.arrayFiliale.includes(item.file.name)); 
 			if(item.file.name.includes(this.currentUser.structure)){
-			item.upload();
+				item.upload();
 			}else{
-			item.isError = true;	
+				item.isError = true;	
 			}
 		}
 	}
-	//this.uploader.uploadAll();
+	
    }
    upload(item : any){
 	if (this.currentUser.structure == "manutan") {
-	if(item.file.name == "filiale1.xlsx" || item.file.name.includes("manutanGMC") || item.file.name.includes("manutanSFA")){
+		if(item.file.name == "filiale1.xlsx" || item.file.name.includes("manutanGMC") || item.file.name.includes("manutanSFA")){
 			item.upload();
-	}else{
-		item.isError = true;	
-	}
+		}else{
+			item.isError = true;	
+		}
 	}else if (item.file.name.includes(this.currentUser.structure)){
 		item.upload();
-	}
+	}else
+		item.isError = true;
 	
    }	
   
