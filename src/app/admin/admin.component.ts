@@ -20,7 +20,7 @@ export class AdminComponent {
   constructor(private _http: Http ,private _adminService: AdminService , private router: Router , private _location: Location ) {
 	if (localStorage.getItem('ifAdmin') != "true") {
 
-	    this._location.back();
+	   // this._location.back();
 	}
 	this.currentUser = JSON.parse(localStorage.getItem("currentUser"));
   }
@@ -111,7 +111,7 @@ export class AdminComponent {
 	}else {
 		 
 		for( let item of this.uploader.queue ){
-			console.log("TEST ARRAY FILIALE  => ", this.arrayFiliale.includes(item.file.name)); 
+			//console.log("TEST ARRAY FILIALE  => ", this.arrayFiliale.includes(item.file.name)); 
 			if(item.file.name.includes(this.currentUser.structure)){
 				item.upload();
 			}else{

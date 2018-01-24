@@ -19,16 +19,14 @@
 	</div>
 </div>
 <div >
-         
-		
 		<div [hidden]="!pageAdmin" >
 			<admin-app></admin-app>
 
-			<button type="button" class="btn btn-default" (click) = "administrer()">
+			<button type="button" class="btn btn-default" (click) = "backclick()">
        			<span class="glyphicon glyphicon-arrow-left"></span> Back
 			</button>
 		</div>
-		<div [hidden]="pageAdmin">
+		 <div [hidden]="pageAdmin">
                        <router-outlet></router-outlet>
                </div>
 	

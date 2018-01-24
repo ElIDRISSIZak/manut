@@ -45,7 +45,7 @@ export class TreeView implements OnInit {
 	idDragged2:any;
 	color2 : any;
 	data: any;
-	arrayFiliale : string [] = [ 'filiale1' , 'Rapide Racking', 'Key' , 'Pichon' , 'Witre' , 'Casal Sport' , 'Ikaros'];
+	arrayFiliale : string [] = [ 'filiale1' , 'Rapide Racking', 'Key' , 'Pichon' , 'Witre' , 'Casal Sport' , 'Ikaros', 'manuco'];
     constructor(private componentResolver: ComponentFactoryResolver,
                 private router: Router, private _http: Http){
 	this.currentUser = JSON.parse(localStorage.getItem("currentUser"));    
@@ -208,7 +208,7 @@ setTimeout(()=>{ cl3.product = this._http.get("/api/sfa/"+cl3.attribut.ID)
      }
     getAttributFi():any {
         
-	if ((localStorage.getItem('ifAdmin') == "true") && (( this.currentUser.structure == "filiale1" ) || ( this.currentUser.structure == "manutan"))) {
+	//if (( this.currentUser.structure == "filiale1" ) || ( this.currentUser.structure == "manutan")) {
 		console.log("heho",this.ClassificationFi);
 	
         this.ClassificationFi["0"].icon = '+';
@@ -323,10 +323,10 @@ setTimeout(()=>{ cl3.product = this._http.get("/api/sfa/"+cl3.attribut.ID)
                
         }
 	return this.ClassificationFi;
-	}else{
+	/*}else{
 		this.ClassificationFi = null; 
 		return this.ClassificationFi;
-	}      
+	} */   
     }
 	getDataSfa(cl:Classification,id:any) {
 	

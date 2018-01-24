@@ -60,4 +60,8 @@ export class AppComponent implements OnDestroy {
         this._location.back();
     } 
 
+	backclick() {
+       this.pageAdmin = !this.pageAdmin;
+    } 
+
 }
