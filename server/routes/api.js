@@ -933,61 +933,57 @@ router.post('/testing', (req, res, next) => {
         
 });
 /* Johnny
- request sfa id + Tag name + name unit */
+
+/*==================================================================================================================*/
+/*================================resquest sfa + attribut name + unit name==========================================*/
+/*==================================================================================================================*/
+
+/* request sfa id + Tag name + name unit */
 router.get('/sfa2/:gmc', (req, res) => {
             
+    
     db.collection("productsmanutan").find({"ClassificationReference.attribut.ClassificationID" : req.params.gmc},function(err, result) {
-		 var name = 'X';
+
           result.forEach((sfa) => {
-		sfa.testzak = "testzak";
             if (sfa.AttributeLink != null && typeof(sfa.AttributeLink) != "undefined") {
-		var attrs = sfa.AttributeLink;
-                attrs.forEach((attributLink) => {
-                attributLink.testzak = "testzak";
-		attributLink.units= [];
-		var units = [];
+                sfa.AttributeLink.forEach((attributLink) => {
+                
                 // request ID + url attribute
-                /*db.collection("attribute").findOne({"attribut.ID" : attributLink.attribut.AttributeID}, function(err, attributes) {
-                //attributLink.name = attributes.Name;
-                name = attributes.Name;
-                //console.log("=====",name);                         
+                db.collection("attribute").findOne({"attribut.ID" : attributLink.attribut.AttributeID}, function(err, attributes) {
+                attributLink.name = attributes.Name;
+                attributLink.units= [];
+                //console.log(attributLink.name);                         
                         
                         if (attributes.Validation != null && typeof(attributes.Validation) != "undefined") {   
                             var validations = attributes.Validation;                             
                             var unitLinks = validations[0].UnitLink;
  
-                                if (unitLinks != null && typeof(unitLinks) != "undefined") {
+                            if (unitLinks != null && typeof(unitLinks) != "undefined") {
                                     
-                                      var cpt = 0;
-                                      unitLinks.forEach((unitLink) => {          
-                                                       
-                                        db.collection("unit").findOne({"attribut.ID":unitLink.attribut.UnitID }, function(err, unit) {
-                                          if (err) throw err;
-                                           //console.log(unitLink.attribut.UnitID);
-                                           //console.log(unit);                                     
-                                           attributLink.units.push(unit);
-						units.push(unit);
-                                           ////console.log(attributLink.units); 
-                                          cpt++;
-                                        }); 
-                                      });
-                                }
+                                var cpt = 0;
+                                unitLinks.forEach((unitLink) => {          
+                                                           
+                                    db.collection("unit").findOne({"attribut.ID":unitLink.attribut.UnitID }, function(err, unit) {
+                                        if (err) throw err;
+                                        //console.log(unitLink.attribut.UnitID);
+                                        //console.log(unit);                                     
+                                        attributLink.units.push(unit.Name[0]);
+                                        //console.log(attributLink.units);
+                                        //console.log(attributLink.units); 
+                                        cpt++;
+                                    }); 
+                                });
+                            }
                         };
-                    });*/
-                   //attributLink.units.push("zakaria"); 
-			//console.log("==>",name);	
-               
-				db.collection("attribute").findOne({"attribut.ID" : attributLink.attribut.AttributeID}, function(err, attributes) {
-					//console.log("==>test first",attributes.Name);
-					attributLink.name = "testzak2";
-				});
-		});
+                    });
+                    
+                });
             }                         
-        }); 
-	//console.log(result);
-	res.json(result);
-   });
-	
+        });  
+        setTimeout(() => {
+            res.json(result);
+        },200); 
+   });   
 });
 
 // Insert JSON format is database from SFA
@@ -1136,7 +1132,7 @@ router.get('/sfa2/:gmc', (req, res) => {
             });                    
         if(err) throw err;           
         });
-            res.json("file inserted ");
+            //res.json("file inserted ");
       });
     });
 

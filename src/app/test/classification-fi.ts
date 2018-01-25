@@ -6,7 +6,7 @@ export class ClassificationFi{
     expanded:boolean;
     checked:boolean;
     showIcon = false;
-    icon = null;
+    icon = '+';
     lvl = 1;
     
     constructor(name,id, classification) {

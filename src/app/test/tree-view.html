@@ -532,26 +532,25 @@
                                                 </span> 
                                             </span>        
                                         <div *ngIf="cl2.expanded">
-						<span *ngIf="cl2.product">
-									</span>
-				<div *ngIf="cl2.product">
-<span dnd-droppable (onDropSuccess)="transferDataSuccess($event , cl2.product)" [matTooltip]="cl2.product.attribut.ID" [matTooltipPosition]="position" >
-					
+						
+				<div *ngIf="cl2.product['0']">
+		<!--<span dnd-droppable (onDropSuccess)="transferDataSuccess($event , cl2.product['0'])" [matTooltip]="cl2.product['0'].attribut.ID" [matTooltipPosition]="position" >-->
+					<span dnd-droppable (onDropSuccess)="transferDataSuccess($event , cl2.product['0'])">
 						<span *ngIf="cl2.product.mapped;else other_span" [ngStyle]="{'background-color' : color}">
-							<img src="/assets/icons/mapping.png" style=" width:14px; height:14px;"/>{{cl2.product.Name["0"]}}
+							<img src="/assets/icons/mapping.png" style=" width:14px; height:14px;"/>{{cl2.product["0"].Name["0"]}}
 						</span>
 										<ng-template #other_span>
-                                                 					{{cl2.product.Name["0"]}}
+                                                 					<span *ngIf="cl2.product['0'].Name">{{cl2.product["0"].Name["0"]}}</span>
                                         					</ng-template>
 		</span>
 
-								<div *ngIf="cl2.product">
-									<span *ngIf="cl2.product.AttributeLink?.length > 0;else other_content" >
-					<ul><li style=" list-style: none;" (click)="toggle(cl2.product.AttributeLink)"><strong>Attributs</strong></li></ul>
-								<ul *ngIf="cl2.product.AttributeLink.expanded"> 
+								<div *ngIf="cl2.product['0']">
+									<span *ngIf="cl2.product['0'].AttributeLink?.length > 0;else other_content" >
+					<ul><li style=" list-style: none;" (click)="toggle(cl2.product['0'].AttributeLink)"><strong>Attributs</strong></li></ul>
+								<ul *ngIf="cl2.product['0'].AttributeLink.expanded"> 
 
 
-                                                                    <li *ngFor="let att of cl2.product.AttributeLink" style=" list-style: none;">
+                                                                    <li *ngFor="let att of cl2.product['0'].AttributeLink" style=" list-style: none;">
 									<span *ngIf="idDropped2 == att.attribut.AttributeID && att.attribut.Mandatory">
 											<img src="/assets/icons/icon-done.png" style=" width:14px; height:14px;"/>
 										</span>
@@ -651,23 +650,24 @@
                                                         </span> 
                                                         <div *ngIf="cl3.expanded">
 								
-				<span *ngIf="cl3.product" dnd-droppable (onDropSuccess)="transferDataSuccess($event , cl3.product)" [matTooltip]="cl3.product.attribut.ID" [matTooltipPosition]="position" >
-										<span *ngIf="cl3.product.mapped;else other_span" [ngStyle]="{'background-color' : color}">
-										<img src="/assets/icons/mapping.png" style=" width:14px; height:14px;"/>{{cl3.product.Name["0"]}}
+		<!--<span *ngIf="cl3.product" dnd-droppable (onDropSuccess)="transferDataSuccess($event , cl3.product['0'])" [matTooltip]="cl3.product['0'].attribut.ID" [matTooltipPosition]="position" >-->
+<span *ngIf="cl3.product['0']" dnd-droppable (onDropSuccess)="transferDataSuccess($event , cl3.product['0'])">				
+						<span *ngIf="cl3.product.mapped;else other_span" [ngStyle]="{'background-color' : color}">
+										<img src="/assets/icons/mapping.png" style=" width:14px; height:14px;"/>{{cl3.product["0"].Name["0"]}}
 										</span>
 										<ng-template #other_span>
-                                                 					{{cl3.product.Name["0"]}}
+                                                 					<span *ngIf="cl3.product['0'].Name">{{cl3.product["0"].Name["0"]}}</span>
                                         					</ng-template>
 							</span>
 								
-									<div *ngIf="cl3.product">
+									<div *ngIf="cl3.product['0']">
                                                                     
 
-                         <span *ngIf="cl3.product.AttributeLink?.length > 0;else other_content" >
-					<ul><li style=" list-style: none;" (click)="toggle(cl3.product.AttributeLink)"><strong>Attributs</strong></li></ul>
-								<div *ngIf="cl3.product.AttributeLink.expanded">  
+                         <span *ngIf="cl3.product['0'].AttributeLink?.length > 0;else other_content" >
+					<ul><li style=" list-style: none;" (click)="toggle(cl3.product['0'].AttributeLink)"><strong>Attributs</strong></li></ul>
+								<div *ngIf="cl3.product['0'].AttributeLink.expanded">  
 			<ul>
-		<li *ngFor="let att of cl3.product.AttributeLink" style=" list-style: none;">
+		<li *ngFor="let att of cl3.product['0'].AttributeLink" style=" list-style: none;">
 									<span *ngIf="idDropped2 == att.attribut.AttributeID && att.attribut.Mandatory">
 											<img src="/assets/icons/icon-done.png" style=" width:14px; height:14px;"/>
 										</span>
@@ -746,21 +746,22 @@
 									
 						<div *ngIf="cl4.expanded">
 					
-			<span *ngIf="cl4.product" dnd-droppable (onDropSuccess)="transferDataSuccess($event , cl4.product)" [matTooltip]="cl4.product.attribut.ID" [matTooltipPosition]="position" >
-										<span *ngIf="cl4.product.mapped;else other_span" [ngStyle]="{'background-color' : color}">
-										<img src="/assets/icons/mapping.png" style=" width:14px; height:14px;"/>{{cl4.product.Name["0"]}}
+		<!--<span *ngIf="cl4.product" dnd-droppable (onDropSuccess)="transferDataSuccess($event , cl4.product['0'])" [matTooltip]="cl4.product['0'].attribut.ID" [matTooltipPosition]="position" >-->
+	<span *ngIf="cl4.product" dnd-droppable (onDropSuccess)="transferDataSuccess($event , cl4.product['0'])" >	
+								<span *ngIf="cl4.product.mapped;else other_span" [ngStyle]="{'background-color' : color}">
+										<img src="/assets/icons/mapping.png" style=" width:14px; height:14px;"/>{{cl4.product["0"].Name["0"]}}
 										</span>
 										<ng-template #other_span>
-                                                 					{{cl4.product.Name["0"]}}
+                                    							<span *ngIf="cl4.product['0'].Name">{{cl4.product["0"].Name["0"]}}</span>
                                         					</ng-template>
 			</span>
-			<span *ngIf="cl4.product.AttributeLink?.length > 0;else other_content" >
-					<ul><li style=" list-style: none;" (click)="toggle(cl4.product.AttributeLink)"><strong>Attributs</strong></li></ul>
-								<div *ngIf="cl4.product.AttributeLink.expanded">
+			<span *ngIf="cl4.product['0'].AttributeLink?.length > 0;else other_content" >
+					<ul><li style=" list-style: none;" (click)="toggle(cl4.product['0'].AttributeLink)"><strong>Attributs</strong></li></ul>
+								<div *ngIf="cl4.product['0'].AttributeLink.expanded">
 
 
 								<ul>
-                                                                    <li *ngFor="let att of cl4.product.AttributeLink" style=" list-style: none;">
+                                                                    <li *ngFor="let att of cl4.product['0'].AttributeLink" style=" list-style: none;">
 									<span *ngIf="idDropped2 == att.attribut.AttributeID && att.attribut.Mandatory">
 											<img src="/assets/icons/icon-done.png" style=" width:14px; height:14px;"/>
 										</span>
@@ -775,11 +776,17 @@
 
 
 <span dnd-droppable class="panel panel-info" [dropZones]="['mapping2']" (onDropSuccess)= "transferDataSuccess2($event , att.attribut.AttributeID)">
-	 		<span (click)="toggle(att)" [matTooltip]="att.MetaData['0'].Value['0']._" [matTooltipPosition]="position">
-                           <strong>
+	 								<span *ngIf="att.MetaData;else other_meta">
+										<span (click)="toggle(att)" [matTooltip]="att.MetaData['0'].Value['0']._" [matTooltipPosition]="position">
+                           							<strong>
 										 {{att.attribut.AttributeID }}</strong>
-                  	</span> 
-			</span>
+                  								</span> 
+									</span>
+									<ng-template #other_meta>
+                                                 			<strong>
+										 {{att.attribut.AttributeID }}</strong>
+                                        				</ng-template>
+</span>
 	
                                                                        
 									

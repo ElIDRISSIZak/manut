@@ -51,14 +51,14 @@ export class TreeView implements OnInit {
 	this.currentUser = JSON.parse(localStorage.getItem("currentUser"));    
 	if (localStorage.getItem('currentUser')) {
            	this.currentUser = JSON.parse(localStorage.getItem("currentUser"));
-   	   	console.log(this.currentUser);
+   	   	//console.log(this.currentUser);
 		
         }
 	if (localStorage.getItem('ifAdmin') == "true") {
 	   this.ifAdmin = true;	
-   	   console.log("tes if "+localStorage.getItem('ifAdmin'));	
+   	   //console.log("tes if "+localStorage.getItem('ifAdmin'));	
 	}
-   	   console.log(localStorage.getItem('ifAdmin'));
+   	   //console.log(localStorage.getItem('ifAdmin'));
 	
     	}
     ngOnInit(){
@@ -66,7 +66,7 @@ export class TreeView implements OnInit {
         console.log("From tree view =>"+this.Classification);        
          this.getAttribut();
 	this.getDataFiliale();
-	console.log("loading Finish oninit -- => ",this.loading);
+	//console.log("loading Finish oninit -- => ",this.loading);
     }
     /*expand(){
         this.expanded = !this.expanded;
@@ -125,15 +125,16 @@ export class TreeView implements OnInit {
                cl2.showIcon = true;
                cl2.icon = '+';
 			
-			setTimeout(()=>{ cl2.product = this._http.get("/api/sfa/"+cl2.attribut.ID)
+			setTimeout(()=>{ cl2.product = this._http.get("/api/sfa2/"+cl2.attribut.ID)
         	.map(product => <any>product.json())        
          	.subscribe(product =>{
-	  	 cl2.product = product
-		if(cl2.product != null){
-         		console.log("SFA PROD -- => ",cl2.product.ClassificationReference["0"].attribut.ClassificationID, "GMC lv1 => ",cl2.Name["0"]);	
+	  	 
+		if(product != null){
+         		//console.log("SFA PROD -- => ",cl2.product.ClassificationReference["0"].attribut.ClassificationID, "GMC lv1 => ",cl2.Name["0"]);	
+			cl2.product = product;			
 			this.count ++;
 			}
-		})}, 900);
+		})}, 200);
 
                if(cl2.Classification){
                     for( let cl3 of cl2.Classification){
@@ -142,39 +143,37 @@ export class TreeView implements OnInit {
                    cl3.showIcon = true;
                    cl3.icon = '+';
 		
-setTimeout(()=>{ cl3.product = this._http.get("/api/sfa/"+cl3.attribut.ID)
+setTimeout(()=>{ cl3.product = this._http.get("/api/sfa2/"+cl3.attribut.ID)
         	.map(product => <any>product.json())        
          	.subscribe(product =>{
-	  	 cl3.product = product
-		if(cl3.product != null){         	
-				console.log("SFA PROD -- => ",cl3.product.ClassificationReference["0"].attribut.ClassificationID, "GMC lv2 => ",cl3.Name["0"]);
+		if(product != null){         	
+				cl3.product = product;
 				this.count ++;
 			}
-		})}, 900);
+		})}, 200);
 
 
-		//dczdzeadzed
+
 		if(cl3.Classification){
                     for( let cl4 of cl3.Classification){
                    cl4.expanded = false;
                    cl4.checked = false;
                    cl4.showIcon = true;
                    cl4.icon = '+';
-			setTimeout(()=>{ cl4.product = this._http.get("/api/sfa/"+cl4.attribut.ID)
+			setTimeout(()=>{ cl4.product = this._http.get("/api/sfa2/"+cl4.attribut.ID)
         	.map(product => <any>product.json())        
          	.subscribe(product =>{
-	  	 cl4.product = product
-		if(cl4.product != null){
-         	console.log("SFA PROD -- => ",cl4.product, "=> GMC  lv3=>", cl4.Name["0"]);
-			
+		if(product != null){
+         	//console.log("SFA PROD -- => ",cl4.product, "=> GMC  lv3=>", cl4.Name["0"]);
+			cl4.product = product;
 				this.count ++;
-				console.log("count => ",this.count );
-				if(this.count == 1470){
+				//console.log("count => ",this.count );
+				if(this.count == 1826){
                				this.loading = true;
 					console.log("count final => ",this.count );
 				}
 			}
-		})}, 900);
+		})}, 200);
 			
 		
 
@@ -196,9 +195,9 @@ setTimeout(()=>{ cl3.product = this._http.get("/api/sfa/"+cl3.attribut.ID)
         this._http.get('/api/filiale/'+this.currentUser.structure)
         .map(ClassificationFi => <ClassificationFi[]>ClassificationFi.json())        
          .subscribe(ClassificationFi =>{
-	   setTimeout(()=>{ this.ClassificationFi = ClassificationFi }, 3000),
+	   setTimeout(()=>{ this.ClassificationFi = ClassificationFi }, 1000),
 	   this.ClassificationFi = ClassificationFi,
-         console.log("FILIALE => ",this.ClassificationFi),
+         //console.log("FILIALE => ",this.ClassificationFi),
 	this.getAttributFi()
 	});
         }else{
@@ -209,9 +208,9 @@ setTimeout(()=>{ cl3.product = this._http.get("/api/sfa/"+cl3.attribut.ID)
     getAttributFi():any {
         
 	//if (( this.currentUser.structure == "filiale1" ) || ( this.currentUser.structure == "manutan")) {
-		console.log("heho",this.ClassificationFi);
+	//	console.log("heho",this.ClassificationFi);
 	
-        this.ClassificationFi["0"].icon = '+';
+        //this.ClassificationFi["0"].icon = '+';
         for( let cl of this.ClassificationFi){
            cl.expanded = false;
            cl.checked = false;
@@ -344,7 +343,7 @@ setTimeout(()=>{ cl3.product = this._http.get("/api/sfa/"+cl3.attribut.ID)
 // Mapping Produit TO SFA
 transferDataSuccess($event: any , att: any) {
         
-		if(window.confirm('Vous allez mapper '+ $event.dragData.name+ 'avec la SFA: '+ att.name+ 'Confirmer le mapping ?')){
+		if(window.confirm('Vous allez mapper '+ $event.dragData.name+ 'avec la SFA: '+ att.Name["0"]+ 'Confirmer le mapping ?')){
 
 			
 		
@@ -365,17 +364,28 @@ transferDataSuccess($event: any , att: any) {
 							console.log("=> PROD MAPp from model", prod );
 				}
 			}
-		}else if($event.dragData.classification){
+		}else if($event.dragData.models){
+								if($event.dragData.models.length > 0){
+									for( let model of $event.dragData.models){
+										if(model.products.length > 0){
+											for( let prod of model.products){
+                   									prod.mapped = true;
+											console.log("=> X", prod );
+											}
+										}	
+                   							}
+								}
+
+
+
+
+			}
+			if($event.dragData.classification){
 			 
 			
 			 if($event.dragData.classification.length > 0){
 				
 				for( let cl of $event.dragData.classification){
-                   			
-
-
-
-
 
 					if(cl.classification.length > 0){
 						if(cl.classification.length > 0){	
@@ -389,7 +399,7 @@ transferDataSuccess($event: any , att: any) {
 										if(model.products.length > 0){
 											for( let prod of model.products){
                    										prod.mapped = true;
-												console.log("=> PROD MAPp from last classif", prod );
+												console.log("=> L1", prod );
 											}
 										}	
                    							}
@@ -397,18 +407,18 @@ transferDataSuccess($event: any , att: any) {
 
 								}	
 								}
-							}else if(cl2.models){
+							else if(cl2.models){
 								if(cl2.models.length > 0){
 									for( let model of cl2.models){
 										if(model.products.length > 0){
 											for( let prod of model.products){
                    									prod.mapped = true;
-											console.log("=> PROD MAPp from last classif", prod );
+											console.log("=> L2", prod );
 											}
 										}	
                    							}
 								}
-						}}}
+						}}}}
 					}
 					
 					else if(cl.models.length > 0){
@@ -417,7 +427,7 @@ transferDataSuccess($event: any , att: any) {
 							if(model.products.length > 0){
 								for( let prod of model.products){
                    							prod.mapped = true;
-									console.log("=> PROD MAPp from last classif", prod );
+									console.log("=> L3", prod );
 								}
 							}	
                    					

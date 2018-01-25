@@ -123,7 +123,7 @@ export class AdminComponent {
    }
    upload(item : any){
 	if (this.currentUser.structure == "manutan") {
-		if(item.file.name == "filiale1.xlsx" || item.file.name.includes("manutanGMC") || item.file.name.includes("manutanSFA")){
+		if(item.file.name == "api2.js" || item.file.name.includes("manutanGMC") || item.file.name.includes("manutanSFA")){
 			item.upload();
 		}else{
 			item.isError = true;	
