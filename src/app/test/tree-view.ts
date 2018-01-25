@@ -131,8 +131,13 @@ export class TreeView implements OnInit {
 	  	 
 		if(product != null){
          		//console.log("SFA PROD -- => ",cl2.product.ClassificationReference["0"].attribut.ClassificationID, "GMC lv1 => ",cl2.Name["0"]);	
-			cl2.product = product;			
-			this.count ++;
+				cl2.product = product;			
+				this.count ++;
+				if(cl2.product['0']){
+					for( let att of cl2.product['0'].AttributeLink){
+						att.message = "ID : "+att.attribut.AttributeID+" units "+att.units;
+					}
+				}
 			}
 		})}, 200);
 
@@ -167,7 +172,7 @@ setTimeout(()=>{ cl3.product = this._http.get("/api/sfa2/"+cl3.attribut.ID)
          	//console.log("SFA PROD -- => ",cl4.product, "=> GMC  lv3=>", cl4.Name["0"]);
 			cl4.product = product;
 				this.count ++;
-				//console.log("count => ",this.count );
+				console.log("count => ",this.count );
 				if(this.count == 1826){
                				this.loading = true;
 					console.log("count final => ",this.count );
@@ -387,10 +392,10 @@ transferDataSuccess($event: any , att: any) {
 				
 				for( let cl of $event.dragData.classification){
 
-					if(cl.classification.length > 0){
+					if(cl.classification){
 						if(cl.classification.length > 0){	
 						for( let cl2 of cl.classification){
-							if(cl2.classification){
+							if(cl2.classification){             //MODELS HERE
 								if(cl2.classification.length > 0){	
 								for( let cl3 of cl2.classification){
 									console.log("=> classif", cl3 );
@@ -407,7 +412,7 @@ transferDataSuccess($event: any , att: any) {
 
 								}	
 								}
-							else if(cl2.models){
+								else if(cl2.models){
 								if(cl2.models.length > 0){
 									for( let model of cl2.models){
 										if(model.products.length > 0){
@@ -418,11 +423,9 @@ transferDataSuccess($event: any , att: any) {
 										}	
                    							}
 								}
-						}}}}
-					}
-					
-					else if(cl.models.length > 0){
-
+						}}}		}
+					}if(cl.models){
+						if(cl.models.length > 0){
 						for( let model of cl.models){
 							if(model.products.length > 0){
 								for( let prod of model.products){
@@ -431,6 +434,7 @@ transferDataSuccess($event: any , att: any) {
 								}
 							}	
                    					
+						}
 						}
 					}
 

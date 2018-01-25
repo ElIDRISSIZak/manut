@@ -561,26 +561,29 @@
 										</span>
                                                  			<img  src="/assets/icons/notImportant.png" style=" width:14px; height:14px;"/>
                                         				</ng-template>	
-								<span *ngIf = "att.MetaData;else other_meta">
+								<span *ngIf = "att.message;else other_meta">
 						<span dnd-droppable class="panel panel-info" [dropZones]="['mapping2']" (onDropSuccess)= "transferDataSuccess2($event , att.attribut.AttributeID)">
-                     							<span  (click)="toggle(att)" [matTooltip]="att.MetaData['0'].Value['0']._" [matTooltipPosition]="position">
+                     							<span  (click)="toggle(att)" [matTooltip]="att.message" [matTooltipPosition]="position">
                                                                             <strong>
 										
-										 {{att.attribut.AttributeID }}
+										 {{att.name }}
+										 <!--{{att.attribut.AttributeID }}-->
 									    </strong>
                                                                         </span> 
 						</span>
 								</span>	
 						<ng-template #other_meta>
                                                <span  (click)="toggle(att)" dnd-droppable class="panel panel-info" [dropZones]="['mapping2']" (onDropSuccess)= "transferDataSuccess2($event , att.attribut.AttributeID)">
-                                                                            <strong>
+									
+									<strong (click)="toggle(att)" >
 										<span *ngIf="idDropped2 == att.attribut.AttributeID">
 											<img src="/assets/icons/icon-done.png" style=" width:10px; height:10px;"/>
 										</span>
-										 {{att.attribut.AttributeID }}
+										 {{att.name }}
+										 <!--{{att.attribut.AttributeID }}-->
 									    </strong>
-                                                                        </span> 
-                                        	</ng-template>
+					</span>
+		                                        	</ng-template>
 
 
                                                                     </li>
@@ -683,13 +686,15 @@
 			<span dnd-droppable class="panel panel-info" [dropZones]="['mapping2']" (onDropSuccess)= "transferDataSuccess2($event , att.attribut.AttributeID)">
 	 		<span (click)="toggle(att)" [matTooltip]="att.MetaData['0'].Value['0']._" [matTooltipPosition]="position">
                            <strong>
-										 {{att.attribut.AttributeID }}</strong>
+										 {{att.name }}
+										 <!--{{att.attribut.AttributeID }}--></strong>
                   	</span> 
 			</span>
 		</span>
 					<ng-template #other_meta>
 						<span dnd-droppable class="panel panel-info" [dropZones]="['mapping2']" (onDropSuccess)= "transferDataSuccess2($event , att.attribut.AttributeID)">
-                                                 <strong>{{att.attribut.AttributeID }}</strong>
+                                                 <strong>{{att.name }}
+										 <!--{{att.attribut.AttributeID }}--></strong>
 						</span>
                                         	</ng-template>
 									
@@ -779,12 +784,14 @@
 	 								<span *ngIf="att.MetaData;else other_meta">
 										<span (click)="toggle(att)" [matTooltip]="att.MetaData['0'].Value['0']._" [matTooltipPosition]="position">
                            							<strong>
-										 {{att.attribut.AttributeID }}</strong>
+										 {{att.name }}
+										 <!--{{att.attribut.AttributeID }}--></strong>
                   								</span> 
 									</span>
 									<ng-template #other_meta>
                                                  			<strong>
-										 {{att.attribut.AttributeID }}</strong>
+										 {{att.name }}
+										 <!--{{att.attribut.AttributeID }}--></strong>
                                         				</ng-template>
 </span>
 	

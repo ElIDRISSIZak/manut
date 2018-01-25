@@ -965,12 +965,13 @@ router.get('/sfa2/:gmc', (req, res) => {
                                                            
                                     db.collection("unit").findOne({"attribut.ID":unitLink.attribut.UnitID }, function(err, unit) {
                                         if (err) throw err;
-                                        //console.log(unitLink.attribut.UnitID);
-                                        //console.log(unit);                                     
-                                        attributLink.units.push(unit.Name[0]);
+                                        if(unit !=null){
+           				 attributLink.units.push(unit.Name[0]);
+        				                                
+                                        
                                         //console.log(attributLink.units);
                                         //console.log(attributLink.units); 
-                                        cpt++;
+                                        cpt++;}
                                     }); 
                                 });
                             }
